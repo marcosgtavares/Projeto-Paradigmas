@@ -11,7 +11,7 @@ SECTION .text
 global _start
 
 _start:
-    mov eax, 2                      ;open file 
+    mov eax, 5                      ;open file 
     mov ebx, [esp + 4]
     mov ecx, 0
     mov edx, 0644o
@@ -19,7 +19,7 @@ _start:
 
 
     mov ebx, eax                    ;read 512bit from the file if possible
-    mov eax, 0
+    mov eax, 3
     mov ecx, file_allocmem
     mov edx, 64
     syscall
