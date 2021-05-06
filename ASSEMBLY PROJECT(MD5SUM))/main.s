@@ -1,11 +1,11 @@
 SECTION .data
-firstpad db 80h
-npad db 0
-bycount dd 0
+firstpad        db 80h
+npad            db 0
+bycount         dd 0
 
 SECTION .bss
-file_allocmem: resb 2000000
-flenght: resb 8
+fileallocmem:   resb 2000000
+flenght:        resb 8
 
 SECTION .text
 global _start
@@ -20,7 +20,7 @@ _start:
 
     mov ebx, eax                    ;read 512bit from the file if possible
     mov eax, 3
-    mov ecx, file_allocmem
+    mov ecx, fileallocmem
     mov edx, 64
     syscall
 
@@ -111,9 +111,9 @@ addbitlenght:
     mov [ecx], ebx
 
 print:
-    mov eax, 1
+    mov eax, 4
     mov ebx, 1
-    mov ecx, file_allocmem
+    mov ecx, fileallocmem
     mov edx, 100
     syscall
     mov eax, 60
