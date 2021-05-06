@@ -1,194 +1,121 @@
 SECTION .data
-flenght dq 0
-firstpad db 128
+firstpad db 80h
 npad db 0
+bycount dd 0
 
 SECTION .bss
-initial_break: resb 8
-current_break: resb 8
-new_break: resb 8
+file_allocmem: resb 2000000
+flenght: resb 8
 
 SECTION .text
 global _start
 
 _start:
-    mov rax, 0ch                    ;system call brk
-    mov rdi, 0                      ;invalid address to get break
-    syscall
-    mov [current_break], rax
-    mov [initial_break], rax
-
-    mov rax, 0ch                    ;system call brk
-    mov [rdi], initial_break        
-    add rdi, 64                     ;allocate 512 bits   
-    syscall
-    mov [new_break], rax
-    add [new_break], 64
-    mov [current_break], rax
-
-    mov rax, 2                      ;open file 
-    mov rdi, [rsp+4]
-    mov rsi, O_RDONLY
-    mov rdx, 0644o
+    mov eax, 2                      ;open file 
+    mov ebx, [esp + 4]
+    mov ecx, 0
+    mov edx, 0644o
     syscall
 
-    mov rdi, rax                    ;read 512bit from the file if possible
-    mov rax, 0
-    mov [rsi], initial_break
-    mov rdx, 64
+
+    mov ebx, eax                    ;read 512bit from the file if possible
+    mov eax, 0
+    mov ecx, file_allocmem
+    mov edx, 64
     syscall
 
-    add [flenght], rax                ;add lenght in bits
-    add [flenght], rax
-    add [flenght], rax
-    add [flenght], rax
-    add [flenght], rax
-    add [flenght], rax
-    add [flenght], rax
-    add [flenght], rax
+    add ecx, 64                     ;move 64 bytes on the allocated memory
 
-    cmp 64, rax
+    mov esi, 0
+    mov [flenght], ebx
+
+    add [flenght], eax              ;add lenght in bits
+    add [flenght], eax
+    add [flenght], eax
+    add [flenght], eax
+    add [flenght], eax
+    add [flenght], eax
+    add [flenght], eax
+    add [flenght], eax
+
+    mov edi, 64
+    cmp edi, eax
     jg padding                      ;if read bytes are less than 64, go to padding
 
-readalloc:                          ;read and allocate memory until the end                         
-    mov rax, 0ch                    ;system call brk
-    mov rdi, new_break        
-    syscall
-    add [new_break], 64               ;512 bits
-    mov [current_break], rax
-    
-    mov rdi, rax                    ;read 512bit from the file if possible
-    mov rax, 0
-    mov rsi, current_break
-    mov rdx, 64
+readalloc:                          ;read on allocated memory until the end                         
     syscall
     
-    add [flenght], rax                ;add lenght in bits
-    add [flenght], rax
-    add [flenght], rax
-    add [flenght], rax
-    add [flenght], rax
-    add [flenght], rax
-    add [flenght], rax
-    add [flenght], rax
+    add ecx, 64                     ;move 64 bytes on the allocated memory
 
-    cmp 0, rax                      ;if there is no more to read
-    je dealloc
-    cmp 64, rax                     ;if read bytes are less than 64, go to padding
+    add [flenght], eax              ;add lenght in bits
+    add [flenght], eax
+    add [flenght], eax
+    add [flenght], eax
+    add [flenght], eax
+    add [flenght], eax
+    add [flenght], eax
+    add [flenght], eax
+
+    
+    cmp esi, eax                     ;if there is no more to read
+    je complete3
+    cmp edi, eax                     ;if read bytes are less than 64, go to padding
     jg padding
-    jmp readalloc                   ;otherwise keep looping
-
-dealloc:
-    mov rax, 0ch                    ;system call brk
-    mov rdi, current_break        
-    syscall
-    mov [new_break], current_break
-    jmp complete3                   ;add 56 bytes
+    jmp readalloc                    ;otherwise keep looping
 
 padding:
-    cmp 56, rax                     ;if read bytes are less than 56, go to complete(to add bytes until it's properly padded)
+    sub ecx, 63
+    mov edi, 56
+    cmp edi, eax                     ;if read bytes are less than 56, go to complete(to add bytes until it's properly padded)
     jg complete
     je complete2                    ;otherwise add 64 bytes(first byte 10000000)
     jl complete4                    ;otherwise add to 64 and add 56
 
 complete:                           ;complete 56
-    mov r8, 56
-    sub r8, rax
-    sub [new_break], 64
-    add [new_break], r8
-    mov rax, 0ch                    ;system call brk
-    mov rdi, new_break        
-    syscall
-    mov [current_break], rax
-    mov [current_break], firstpad
-    add [current_break], 1
-    sub r8, 1
-looppad:                            ;add fisrt padding and loop for the rest
-    cmp r8, 0
-    je addbitlenght
-    mov [current_break], npad
-    add current_break, 1
-    sub r8, 1
+    mov [ecx], byte 80h
+    mov edi, 56
+    sub edi, eax
+    sub edi, 1
     jmp looppad
 
 complete2:                          ;add 64
-    mov rax, 0ch                    ;system call brk
-    mov rdi, new_break        
-    syscall
-    mov new_break, rax
-    mov current_break, rax
-    mov [current_break], firstpad
-    add current_break, 1
-    mov r8, 63
-looppad2:                            ;add fisrt padding and loop for the rest
-    cmp r8, 0
-    je addbitlenght
-    mov [current_break], npad
-    add current_break, 1
-    sub r8, 1
-    jmp looppad2
+    mov [ecx], byte 80h
+    mov edi, 63
+    jmp looppad
 
 complete3:                          ;add 56
-    add new_break, 56
-    mov rax, 0ch                    ;system call brk
-    mov rdi, new_break        
-    syscall
-    mov current_break, rax
-    mov [current_break], firstpad
-    add current_break, 1
-    mov r8, 55
-looppad3:                            ;add fisrt padding and loop for the rest
-    cmp r8, 0
-    je addbitlenght
-    mov [current_break], npad
-    add current_break, 1
-    sub r8, 1
-    jmp looppad3
+    sub ecx, 63
+    mov [ecx], byte 80h
+    mov edi, 55
+    jmp looppad
+
 complete4:                          ;otherwise add to 64 and add 56
-    mov r8, 64
-    sub r8, rax
-    sub new_break, 64
-    add new_break, r8
-    mov rax, 0ch                    ;system call brk
-    mov rdi, new_break        
-    syscall
-    add new_break, 56
-    mov current_break, rax
-    mov rax, 0ch                    ;system call brk
-    mov rdi, new_break        
-    syscall
-    mov [current_break], firstpad
-    add current_break, 1
-    add r8, 55
+    mov [ecx], byte 80h
+    mov edi, 64
+    sub edi, eax
+    add edi, 55
 
-looppad4:                            ;add fisrt padding and loop for the rest
-    cmp r8, 0
-    je addbitlenght
-    mov [current_break], npad
-    add current_break, 1
-    sub r8, 1
-    jmp looppad4
+looppad:                            ;add fisrt padding and loop for the rest
+    jz addbitlenght
+    add ecx, 1
+    mov [ecx], byte 0
+    sub edi, 1
+    jmp looppad
 
-addbitlengh:
-    add new_break, 8
-    mov rax, 0ch                    ;system call brk
-    mov rdi, new_break        
-    syscall
-    mov current_break, rax
-    mov [current_break], flenght
+addbitlenght:
+    add ecx, 1
+    mov ebx, dword[flenght]
+    mov [ecx], ebx
+    add ecx, 4
+    mov ebx, dword[flenght+4]
+    mov [ecx], ebx
 
 print:
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, initial_break
-    mov r9, 0
-    add r9, new_break
-    sub r9, initial_break
-    mov rdx, r9
+    mov eax, 1
+    mov ebx, 1
+    mov ecx, file_allocmem
+    mov edx, 100
     syscall
-    mov rax, 0ch                    ;system call brk
-    mov rdi, initial_break 
-    syscall
-    mov rax, 60
-    mov rdi, 0
+    mov eax, 60
+    mov ebx, 0
     syscall
