@@ -116,6 +116,6 @@ print:
     mov ecx, fileallocmem
     mov edx, 100
     syscall
-    mov eax, 60
+    mov eax, 1
     mov ebx, 0
     syscall
