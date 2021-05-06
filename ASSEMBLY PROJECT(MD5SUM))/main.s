@@ -15,14 +15,14 @@ _start:
     mov ebx, [esp + 4]
     mov ecx, 0
     mov edx, 0644o
-    syscall
+    INT 80h
 
 
     mov ebx, eax                    ;read 512bit from the file if possible
     mov eax, 3
     mov ecx, fileallocmem
     mov edx, 64
-    syscall
+    int 80h
 
     add ecx, 64                     ;move 64 bytes on the allocated memory
 
