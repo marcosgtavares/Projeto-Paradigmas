@@ -27,7 +27,7 @@ _start:
     add ecx, 64                     ;move 64 bytes on the allocated memory
 
     mov esi, 0
-    mov [flenght], ebx
+    mov [flenght], esi
 
     add [flenght], eax              ;add lenght in bits
     add [flenght], eax
