@@ -348,7 +348,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword [h1]                 
     push dword [h2]
     push dword [h3]
-    push dword [edx + 30]                
+    push dword [edx + 20]                
     push dword 5
     push dword 3593408605           
     call gg
