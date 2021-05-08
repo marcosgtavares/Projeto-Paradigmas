@@ -152,10 +152,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 7
     push dword 3614090360           
     call ff
-    pop dword[h3]                   ;retrieve the new values
-    pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
+    pop dword[h0]                   ;retrieve the value of 'a'
 
     push dword [h3]                 ;2ff
     push dword [h0]
@@ -166,9 +163,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 3905402710
     call ff
     pop dword[h3]
-    pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h2]                 ;3ff
     push dword [h3]
@@ -178,10 +172,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 17
     push dword 606105819
     call ff
-    pop dword[h3]
     pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h1]                 ;4ff
     push dword [h2]
@@ -191,10 +182,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 22
     push dword 3250441966
     call ff
-    pop dword[h3]
-    pop dword[h2]
     pop dword[h1]
-    pop dword[h0]
 
     push dword [h0]                 ;5ff
     push dword [h1]                 
@@ -204,9 +192,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 7
     push dword 4118548399           
     call ff
-    pop dword[h3]                   
-    pop dword[h2]
-    pop dword[h1]
     pop dword[h0]
 
     push dword [h3]                 ;6ff
@@ -218,9 +203,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 1200080426
     call ff
     pop dword[h3]
-    pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h2]                 ;7ff
     push dword [h3]
@@ -230,10 +212,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 17
     push dword 2821735955
     call ff
-    pop dword[h3]
     pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h1]                 ;8ff
     push dword [h2]
@@ -243,10 +222,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 22
     push dword 4249261313
     call ff
-    pop dword[h3]
-    pop dword[h2]
     pop dword[h1]
-    pop dword[h0]
 
     push dword [h0]                 ;9ff
     push dword [h1]                 
@@ -256,9 +232,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 7
     push dword 1770035416           
     call ff
-    pop dword[h3]                   
-    pop dword[h2]
-    pop dword[h1]
     pop dword[h0]
 
     push dword [h3]                 ;10ff
@@ -270,9 +243,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 2336552879
     call ff
     pop dword[h3]
-    pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h2]                 ;11ff
     push dword [h3]
@@ -282,10 +252,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 17
     push dword 4294925233
     call ff
-    pop dword[h3]
     pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h1]                 ;12ff
     push dword [h2]
@@ -295,10 +262,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 22
     push dword 2304563134
     call ff
-    pop dword[h3]
-    pop dword[h2]
     pop dword[h1]
-    pop dword[h0]
 
     push dword [h0]                 ;13ff
     push dword [h1]                 
@@ -308,9 +272,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 7
     push dword 1804603682           
     call ff
-    pop dword[h3]                   
-    pop dword[h2]
-    pop dword[h1]
     pop dword[h0]
 
     push dword [h3]                 ;14ff
@@ -322,9 +283,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 4254626195
     call ff
     pop dword[h3]
-    pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h2]                 ;15ff
     push dword [h3]
@@ -334,10 +292,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 17
     push dword 2792965006
     call ff
-    pop dword[h3]
     pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h1]                 ;16ff
     push dword [h2]
@@ -347,10 +302,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 22
     push dword 1236535329
     call ff
-    pop dword[h3]
-    pop dword[h2]
     pop dword[h1]
-    pop dword[h0]
 
     push dword [h0]                 ;1gg
     push dword [h1]                 
@@ -360,9 +312,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 5
     push dword 4129170786           
     call gg
-    pop dword[h3]                   
-    pop dword[h2]
-    pop dword[h1]
     pop dword[h0]
 
     push dword [h3]                 ;2gg
@@ -374,9 +323,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 3225465664
     call gg
     pop dword[h3]
-    pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h2]                 ;3gg
     push dword [h3]
@@ -386,10 +332,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 14
     push dword 643717713
     call gg
-    pop dword[h3]
     pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h1]                 ;4gg
     push dword [h2]
@@ -399,10 +342,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 20
     push dword 3921069994
     call gg
-    pop dword[h3]
-    pop dword[h2]
     pop dword[h1]
-    pop dword[h0]
 
     push dword [h0]                 ;5gg
     push dword [h1]                 
@@ -412,9 +352,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 5
     push dword 3593408605           
     call gg
-    pop dword[h3]                   
-    pop dword[h2]
-    pop dword[h1]
     pop dword[h0]
 
     push dword [h3]                 ;6gg
@@ -426,9 +363,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 38016083
     call gg
     pop dword[h3]
-    pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h2]                 ;7gg
     push dword [h3]
@@ -438,10 +372,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 14
     push dword 3634488961
     call gg
-    pop dword[h3]
     pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h1]                 ;8gg
     push dword [h2]
@@ -451,10 +382,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 20
     push dword 3889429448
     call gg
-    pop dword[h3]
-    pop dword[h2]
     pop dword[h1]
-    pop dword[h0]
 
     push dword [h0]                 ;9gg
     push dword [h1]                 
@@ -464,9 +392,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 5
     push dword 568446438           
     call gg
-    pop dword[h3]                   
-    pop dword[h2]
-    pop dword[h1]
     pop dword[h0]
 
     push dword [h3]                 ;10gg
@@ -478,9 +403,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 3275163606
     call gg
     pop dword[h3]
-    pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h2]                 ;11gg
     push dword [h3]
@@ -490,10 +412,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 14
     push dword 4107603335
     call gg
-    pop dword[h3]
     pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h1]                 ;12gg
     push dword [h2]
@@ -503,10 +422,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 20
     push dword 1163531501
     call gg
-    pop dword[h3]
-    pop dword[h2]
     pop dword[h1]
-    pop dword[h0]
 
     push dword [h0]                 ;13gg
     push dword [h1]                 
@@ -516,9 +432,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 5
     push dword 2850285829           
     call gg
-    pop dword[h3]                   
-    pop dword[h2]
-    pop dword[h1]
     pop dword[h0]
 
     push dword [h3]                 ;14gg
@@ -530,9 +443,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 4243563512
     call gg
     pop dword[h3]
-    pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h2]                 ;15gg
     push dword [h3]
@@ -542,10 +452,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 14
     push dword 1735328473
     call gg
-    pop dword[h3]
     pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h1]                 ;16gg
     push dword [h2]
@@ -555,10 +462,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 20
     push dword 2368359562
     call gg
-    pop dword[h3]
-    pop dword[h2]
     pop dword[h1]
-    pop dword[h0]
 
     push dword [h0]                 ;1hh
     push dword [h1]                 
@@ -568,9 +472,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 4
     push dword 4294588738           
     call hh
-    pop dword[h3]                   
-    pop dword[h2]
-    pop dword[h1]
     pop dword[h0]
 
     push dword [h3]                 ;2hh
@@ -582,9 +483,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 2272392833
     call hh
     pop dword[h3]
-    pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h2]                 ;3hh
     push dword [h3]
@@ -594,10 +492,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 16
     push dword 1839030562
     call hh
-    pop dword[h3]
     pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h1]                 ;4hh
     push dword [h2]
@@ -607,10 +502,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 23
     push dword 4259657740
     call hh
-    pop dword[h3]
-    pop dword[h2]
     pop dword[h1]
-    pop dword[h0]
 
     push dword [h0]                 ;5hh
     push dword [h1]                 
@@ -620,9 +512,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 4
     push dword 2763975236           
     call hh
-    pop dword[h3]                   
-    pop dword[h2]
-    pop dword[h1]
     pop dword[h0]
 
     push dword [h3]                 ;6hh
@@ -634,9 +523,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 1272893353
     call hh
     pop dword[h3]
-    pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h2]                 ;7hh
     push dword [h3]
@@ -646,10 +532,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 16
     push dword 4139469664
     call hh
-    pop dword[h3]
     pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h1]                 ;8hh
     push dword [h2]
@@ -659,10 +542,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 23
     push dword 3200236656
     call hh
-    pop dword[h3]
-    pop dword[h2]
     pop dword[h1]
-    pop dword[h0]
 
     push dword [h0]                 ;9hh
     push dword [h1]                 
@@ -672,9 +552,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 4
     push dword 681279174           
     call hh
-    pop dword[h3]                   
-    pop dword[h2]
-    pop dword[h1]
     pop dword[h0]
 
     push dword [h3]                 ;10hh
@@ -686,9 +563,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 3936430074
     call hh
     pop dword[h3]
-    pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h2]                 ;11hh
     push dword [h3]
@@ -698,10 +572,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 16
     push dword 3572445317
     call hh
-    pop dword[h3]
     pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h1]                 ;12hh
     push dword [h2]
@@ -711,10 +582,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 23
     push dword 76029189
     call hh
-    pop dword[h3]
-    pop dword[h2]
     pop dword[h1]
-    pop dword[h0]
 
     push dword [h0]                 ;13hh
     push dword [h1]                 
@@ -724,9 +592,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 4
     push dword 3654602809           
     call hh
-    pop dword[h3]                   
-    pop dword[h2]
-    pop dword[h1]
     pop dword[h0]
 
     push dword [h3]                 ;14hh
@@ -738,9 +603,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 3873151461
     call hh
     pop dword[h3]
-    pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h2]                 ;15hh
     push dword [h3]
@@ -750,10 +612,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 16
     push dword 530742520
     call hh
-    pop dword[h3]
     pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h1]                 ;16hh
     push dword [h2]
@@ -763,10 +622,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 23
     push dword 3299628645
     call hh
-    pop dword[h3]
-    pop dword[h2]
     pop dword[h1]
-    pop dword[h0]
 
     push dword [h0]                 ;1ii
     push dword [h1]                 
@@ -776,9 +632,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 6
     push dword 4096336452           
     call ii
-    pop dword[h3]                   
-    pop dword[h2]
-    pop dword[h1]
     pop dword[h0]
 
     push dword [h3]                 ;2ii
@@ -790,9 +643,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 1126891415
     call ii
     pop dword[h3]
-    pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h2]                 ;3ii
     push dword [h3]
@@ -802,10 +652,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 15
     push dword 2878612391
     call ii
-    pop dword[h3]
     pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h1]                 ;4ii
     push dword [h2]
@@ -815,10 +662,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 21
     push dword 4237533241
     call ii
-    pop dword[h3]
-    pop dword[h2]
     pop dword[h1]
-    pop dword[h0]
 
     push dword [h0]                 ;5ii
     push dword [h1]                 
@@ -828,9 +672,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 6
     push dword 1700485571           
     call ii
-    pop dword[h3]                   
-    pop dword[h2]
-    pop dword[h1]
     pop dword[h0]
 
     push dword [h3]                 ;6ii
@@ -842,9 +683,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 2399980690
     call ii
     pop dword[h3]
-    pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h2]                 ;7ii
     push dword [h3]
@@ -854,10 +692,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 15
     push dword 4293915773
     call ii
-    pop dword[h3]
     pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h1]                 ;8ii
     push dword [h2]
@@ -867,10 +702,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 21
     push dword 2240044497
     call ii
-    pop dword[h3]
-    pop dword[h2]
     pop dword[h1]
-    pop dword[h0]
 
     push dword [h0]                 ;9ii
     push dword [h1]                 
@@ -880,9 +712,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 6
     push dword 1873313359           
     call ii
-    pop dword[h3]                   
-    pop dword[h2]
-    pop dword[h1]
     pop dword[h0]
 
     push dword [h3]                 ;10ii
@@ -894,9 +723,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 4264355552
     call ii
     pop dword[h3]
-    pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h2]                 ;11ii
     push dword [h3]
@@ -906,10 +732,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 15
     push dword 2734768916
     call ii
-    pop dword[h3]
     pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h1]                 ;12ii
     push dword [h2]
@@ -919,10 +742,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 21
     push dword 1309151649
     call ii
-    pop dword[h3]
-    pop dword[h2]
     pop dword[h1]
-    pop dword[h0]
 
     push dword [h0]                 ;13ii
     push dword [h1]                 
@@ -932,10 +752,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 6
     push dword 4149444226           
     call ii
-    pop dword[h3]                   
-    pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
+    pop dword[h0]                   
 
     push dword [h3]                 ;14ii
     push dword [h0]
@@ -946,9 +763,6 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 3174756917
     call ii
     pop dword[h3]
-    pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h2]                 ;15ii
     push dword [h3]
@@ -958,10 +772,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 15
     push dword 718787259
     call ii
-    pop dword[h3]
     pop dword[h2]
-    pop dword[h1]
-    pop dword[h0]
 
     push dword [h1]                 ;16ii
     push dword [h2]
@@ -971,10 +782,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword 21
     push dword 3951481745
     call ii
-    pop dword[h3]
-    pop dword[h2]
     pop dword[h1]
-    pop dword[h0]
 
     mov edi, dword[h0]              ;increment hn
     add edi, dword[inita]
@@ -1110,16 +918,14 @@ ff:                                 ;tranformation functions
     pop dword [a]
 
     mov ebx, dword [b]
-    and ebx, dword [c]   
-    not dword [b]
+    and ebx, dword [c]  
     mov eax, dword [b]
+    not eax
     and eax, dword [d]
     or eax, ebx
     
     add dword [a], eax
     mov ebx, dword [x]
-    add dword [a], ebx
-    mov ebx, dword[s]
     add dword [a], ebx
     mov ebx, dword[ac]
     add dword [a], ebx
@@ -1129,14 +935,11 @@ ff:                                 ;tranformation functions
 rotateleftf:    
     rol eax, 1                      ;segfault
     sub ebx, 1
-    jz rotateleftf
+    jnz rotateleftf
 
     add eax, dword[b] 
 
     push eax
-    push dword [b]
-    push dword [c]
-    push dword [d]
 
     push esi                        ;return adress
     ret
@@ -1153,16 +956,14 @@ gg:
     pop dword [a]
 
     mov ebx, dword [b]
-    and ebx, dword [d]   
-    not dword [d]
-    mov eax, dword [d]
-    and eax, dword [c]
+    and ebx, dword [d]
+    mov eax, dword [c]   
+    not eax
+    and eax, dword [d]
     or eax, ebx
 
     add dword [a], eax
     mov ebx, dword [x]
-    add dword [a], ebx
-    mov ebx, dword[s]
     add dword [a], ebx
     mov ebx, dword[ac]
     add dword [a], ebx
@@ -1172,14 +973,11 @@ gg:
 rotateleftg:    
     rol eax, 1
     sub ebx, 1
-    jz rotateleftg
+    jnz rotateleftg
 
     add eax, dword[b] 
 
     push eax
-    push dword [b]
-    push dword [c]
-    push dword [d]
 
     push esi                        ;return adress
     ret
@@ -1195,14 +993,12 @@ hh:
     pop dword [b]
     pop dword [a]
 
-    mov ebx, dword [b]
-    xor ebx, dword [c]
-    xor ebx, dword [d]
+    mov eax, dword [b]
+    xor eax, dword [c]
+    xor eax, dword [d]
 
     add dword [a], eax
     mov ebx, dword [x]
-    add dword [a], ebx
-    mov ebx, dword[s]
     add dword [a], ebx
     mov ebx, dword[ac]
     add dword [a], ebx
@@ -1212,14 +1008,11 @@ hh:
 rotatelefth:    
     rol eax, 1
     sub ebx, 1
-    jz rotatelefth
+    jnz rotatelefth
 
     add eax, dword[b] 
 
     push eax
-    push dword [b]
-    push dword [c]
-    push dword [d]
     
     push esi                        ;return adress
     ret
@@ -1229,15 +1022,13 @@ ii:
 
     mov eax, dword [c]
     mov ebx, dword [b]
-    not dword [d]
     mov ecx, dword [d]
+    not ecx
     or ebx, ecx
     xor eax, ebx
 
     add dword [a], eax
     mov ebx, dword [x]
-    add dword [a], ebx
-    mov ebx, dword[s]
     add dword [a], ebx
     mov ebx, dword[ac]
     add dword [a], ebx
@@ -1247,14 +1038,11 @@ ii:
 rotatelefti:    
     rol eax, 1
     sub ebx, 1
-    jz rotatelefti
+    jnz rotatelefti
 
     add eax, dword[b] 
 
     push eax
-    push dword [b]
-    push dword [c]
-    push dword [d]
 
     push esi                        ;return adress
     ret
