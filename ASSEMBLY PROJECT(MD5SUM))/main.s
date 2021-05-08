@@ -18,15 +18,16 @@ x:              resb 4
 s:              resb 4
 ac:             resb 4 
 tlenght:        resb 4    
+digest:         resb 32
 
 SECTION .text
 global _start
 
 _start:
-    mov dword [h3], 1732584193
-    mov dword [h2], 4023233417
-    mov dword [h1], 2562383102
-    mov dword [h0], 271733878
+    mov dword [h0], 1732584193
+    mov dword [h1], 4023233417
+    mov dword [h2], 2562383102
+    mov dword [h3], 271733878
     mov dword [tlenght], 0
 
     mov eax, 5                      ;open file 
@@ -94,13 +95,13 @@ complete:                           ;complete 56
     mov edi, 55
     sub edi, eax
     sub ecx, edi
-    mov [ecx], byte 4ah
+    mov [ecx], byte 80h
     jmp looppad
 
 complete2:                          ;add 64
     add dword[tlenght], 1           ;add lenght in 64 bytes
     sub ecx, 7
-    mov [ecx], byte 4ah
+    mov [ecx], byte 80h
     mov edi, 63
     jmp looppad
 
@@ -109,13 +110,13 @@ complete3:                          ;otherwise add to 64 and add 56
     mov edi, 64
     sub edi, eax                    
     sub ecx, edi
-    mov [ecx], byte 4ah
+    mov [ecx], byte 80h
     add edi, 55
 
 looppad:                            ;add fisrt padding and loop for the rest
     jz addbitlenght
     add ecx, 1
-    mov [ecx], byte 4bh
+    mov [ecx], byte 0
     sub edi, 1
     jmp looppad
 
@@ -123,7 +124,7 @@ addbitlenght:
     add ecx, 1
     mov ebx, dword[flenght]
     mov [ecx], ebx
-    add ecx, 1
+    add ecx, 4
     mov ebx, dword[flenght+4]
     mov [ecx], ebx
 
@@ -975,26 +976,130 @@ foreachchunk64:                     ;main loop for each 64 bytes
     pop dword[h1]
     pop dword[h0]
 
+    mov edi, dword[h0]              ;increment hn
+    add edi, dword[inita]
+    mov dword[h0], edi
+    mov edi, dword[h1]
+    add edi, dword[initb]
+    mov dword[h1], edi
+    mov edi, dword[h2]
+    add edi, dword[initc]
+    mov dword[h2], edi
+    mov edi, dword[h3]
+    add edi, dword[initd]
+    mov dword[h3], edi
+
     
-
-    sub dword [tlenght], 1
     add edx, 64                     ;move to the next 64 byte segment
-    jz foreachchunk64               ;keep doing it if there's more chunks to process
+    sub dword [tlenght], 1
+    jnz foreachchunk64               ;keep doing it if there's more chunks to process
 
-appendhn:
+hntohex:
+    mov edx, digest
+    mov edi, h0
+    mov esi, 4
+
+digestloop0:    
+    mov al, byte[edi]
+    
+    call to2characters
+    mov byte[edx], bh
+    mov byte[edx+1], ch
+    add edx, 2
+    add edi, 1
+    sub esi, 1
+    jnz digestloop0
+
+    mov edi, h1
+    mov esi, 4
+
+digestloop1:    
+    mov al, byte[edi]
+    
+    call to2characters
+    mov byte[edx], bh
+    mov byte[edx+1], ch
+    add edx, 2
+    add edi, 1
+    sub esi, 1
+    jnz digestloop1
+
+    mov edi, h2
+    mov esi, 4
+
+digestloop2:    
+    mov al, byte[edi]
+    
+    call to2characters
+    mov byte[edx], bh
+    mov byte[edx+1], ch
+    add edx, 2
+    add edi, 1
+    sub esi, 1
+    jnz digestloop2
+
+    mov edi, h3
+    mov esi, 4
+
+digestloop3:    
+    mov al, byte[edi]
+    
+    call to2characters
+    mov byte[edx], bh
+    mov byte[edx+1], ch
+    add edx, 2
+    add edi, 1
+    sub esi, 1
+    jnz digestloop3
 
 print:
     mov eax, 4
     mov ebx, 1
-    mov ecx, fileallocmem
-    mov edx, 1000000
+    mov ecx, digest
+    mov edx, 32
     int 80h
    
     mov eax, 1
     mov ebx, 0
     int 80h
 
-ff:
+
+to2characters:                      ;transform a byte in 2 hex caracters
+    mov ah, al
+    shr ah, 4
+    and al, 0fh
+    cmp ah, 10
+    jl numappendh
+    jmp charappendh
+
+rethere:
+    cmp al, 10
+    jl numappendl
+    jmp charappendl
+
+numappendh:
+    mov bh, 48
+    add bh, ah
+    jmp rethere
+
+charappendh:
+    sub ah, 9
+    mov bh, 96
+    add bh, ah
+    jmp rethere
+
+numappendl:
+    mov ch, 48
+    add ch, al
+    ret
+
+charappendl:
+    sub al, 9
+    mov ch, 96
+    add ch, al
+    ret
+
+ff:                                 ;tranformation functions
     pop esi                         ;saving return adress
     pop dword [ac]
     pop dword [s]
