@@ -130,7 +130,7 @@ addbitlenght:
     mov edx, fileallocmem
 
 foreachchunk64:                     ;main loop for each 64 bytes
-    mov edi, inita
+    mov edi, inita                  ;store hn values on registers 
     mov esi, dword [h0]
     mov [edi], esi
     mov edi, initb
@@ -142,23 +142,844 @@ foreachchunk64:                     ;main loop for each 64 bytes
     mov edi, initd
     mov esi, dword [h3]
     mov [edi], esi
+                                    ;start round 1
+    push dword [h0]                 ;1ff
+    push dword [h1]                 ;push the func parameters on the stack
+    push dword [h2]
+    push dword [h3]
+    push dword [edx]                ;move on the vector(64 bytes segment)
+    push dword 7
+    push dword 3614090360           
+    call ff
+    pop dword[h3]                   ;retrieve the new values
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
 
+    push dword [h3]                 ;2ff
     push dword [h0]
     push dword [h1]
     push dword [h2]
-    push dword [h3]
-    push dword [edx]
-    push dword 7
-    push dword 3614090360
-    ;call ff
+    push dword [edx + 4]
+    push dword 12
+    push dword 3905402710
+    call ff
     pop dword[h3]
     pop dword[h2]
     pop dword[h1]
     pop dword[h0]
 
+    push dword [h2]                 ;3ff
+    push dword [h3]
+    push dword [h0]
+    push dword [h1]
+    push dword [edx + 8]
+    push dword 17
+    push dword 606105819
+    call ff
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h1]                 ;4ff
+    push dword [h2]
+    push dword [h3]
+    push dword [h0]
+    push dword [edx + 12]
+    push dword 22
+    push dword 3250441966
+    call ff
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h0]                 ;5ff
+    push dword [h1]                 
+    push dword [h2]
+    push dword [h3]
+    push dword [edx + 16]                
+    push dword 7
+    push dword 4118548399           
+    call ff
+    pop dword[h3]                   
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h3]                 ;6ff
+    push dword [h0]
+    push dword [h1]
+    push dword [h2]
+    push dword [edx + 20]
+    push dword 12
+    push dword 1200080426
+    call ff
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h2]                 ;7ff
+    push dword [h3]
+    push dword [h0]
+    push dword [h1]
+    push dword [edx + 24]
+    push dword 17
+    push dword 2821735955
+    call ff
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h1]                 ;8ff
+    push dword [h2]
+    push dword [h3]
+    push dword [h0]
+    push dword [edx + 28]
+    push dword 22
+    push dword 4249261313
+    call ff
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h0]                 ;9ff
+    push dword [h1]                 
+    push dword [h2]
+    push dword [h3]
+    push dword [edx + 32]                
+    push dword 7
+    push dword 1770035416           
+    call ff
+    pop dword[h3]                   
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h3]                 ;10ff
+    push dword [h0]
+    push dword [h1]
+    push dword [h2]
+    push dword [edx + 36]
+    push dword 12
+    push dword 2336552879
+    call ff
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h2]                 ;11ff
+    push dword [h3]
+    push dword [h0]
+    push dword [h1]
+    push dword [edx + 40]
+    push dword 17
+    push dword 4294925233
+    call ff
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h1]                 ;12ff
+    push dword [h2]
+    push dword [h3]
+    push dword [h0]
+    push dword [edx + 44]
+    push dword 22
+    push dword 2304563134
+    call ff
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h0]                 ;13ff
+    push dword [h1]                 
+    push dword [h2]
+    push dword [h3]
+    push dword [edx + 48]                
+    push dword 7
+    push dword 1804603682           
+    call ff
+    pop dword[h3]                   
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h3]                 ;14ff
+    push dword [h0]
+    push dword [h1]
+    push dword [h2]
+    push dword [edx + 52]
+    push dword 12
+    push dword 4254626195
+    call ff
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h2]                 ;15ff
+    push dword [h3]
+    push dword [h0]
+    push dword [h1]
+    push dword [edx + 56]
+    push dword 17
+    push dword 2792965006
+    call ff
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h1]                 ;16ff
+    push dword [h2]
+    push dword [h3]
+    push dword [h0]
+    push dword [edx + 60]
+    push dword 22
+    push dword 1236535329
+    call ff
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h0]                 ;1gg
+    push dword [h1]                 
+    push dword [h2]
+    push dword [h3]
+    push dword [edx + 4]                
+    push dword 5
+    push dword 4129170786           
+    call gg
+    pop dword[h3]                   
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h3]                 ;2gg
+    push dword [h0]
+    push dword [h1]
+    push dword [h2]
+    push dword [edx + 24]
+    push dword 9
+    push dword 3225465664
+    call gg
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h2]                 ;3gg
+    push dword [h3]
+    push dword [h0]
+    push dword [h1]
+    push dword [edx + 44]
+    push dword 14
+    push dword 643717713
+    call gg
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h1]                 ;4gg
+    push dword [h2]
+    push dword [h3]
+    push dword [h0]
+    push dword [edx]
+    push dword 20
+    push dword 3921069994
+    call gg
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h0]                 ;5gg
+    push dword [h1]                 
+    push dword [h2]
+    push dword [h3]
+    push dword [edx + 30]                
+    push dword 5
+    push dword 3593408605           
+    call gg
+    pop dword[h3]                   
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h3]                 ;6gg
+    push dword [h0]
+    push dword [h1]
+    push dword [h2]
+    push dword [edx + 40]
+    push dword 9
+    push dword 38016083
+    call gg
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h2]                 ;7gg
+    push dword [h3]
+    push dword [h0]
+    push dword [h1]
+    push dword [edx + 60]
+    push dword 14
+    push dword 3634488961
+    call gg
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h1]                 ;8gg
+    push dword [h2]
+    push dword [h3]
+    push dword [h0]
+    push dword [edx + 16]
+    push dword 20
+    push dword 3889429448
+    call gg
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h0]                 ;9gg
+    push dword [h1]                 
+    push dword [h2]
+    push dword [h3]
+    push dword [edx + 36]                
+    push dword 5
+    push dword 568446438           
+    call gg
+    pop dword[h3]                   
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h3]                 ;10gg
+    push dword [h0]
+    push dword [h1]
+    push dword [h2]
+    push dword [edx + 56]
+    push dword 9
+    push dword 3275163606
+    call gg
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h2]                 ;11gg
+    push dword [h3]
+    push dword [h0]
+    push dword [h1]
+    push dword [edx + 12]
+    push dword 14
+    push dword 4107603335
+    call gg
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h1]                 ;12gg
+    push dword [h2]
+    push dword [h3]
+    push dword [h0]
+    push dword [edx + 32]
+    push dword 20
+    push dword 1163531501
+    call gg
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h0]                 ;13gg
+    push dword [h1]                 
+    push dword [h2]
+    push dword [h3]
+    push dword [edx + 52]                
+    push dword 5
+    push dword 2850285829           
+    call gg
+    pop dword[h3]                   
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h3]                 ;14gg
+    push dword [h0]
+    push dword [h1]
+    push dword [h2]
+    push dword [edx + 8]
+    push dword 9
+    push dword 4243563512
+    call gg
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h2]                 ;15gg
+    push dword [h3]
+    push dword [h0]
+    push dword [h1]
+    push dword [edx + 28]
+    push dword 14
+    push dword 1735328473
+    call gg
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h1]                 ;16gg
+    push dword [h2]
+    push dword [h3]
+    push dword [h0]
+    push dword [edx + 48]
+    push dword 20
+    push dword 2368359562
+    call gg
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h0]                 ;1hh
+    push dword [h1]                 
+    push dword [h2]
+    push dword [h3]
+    push dword [edx + 20]                
+    push dword 4
+    push dword 4294588738           
+    call hh
+    pop dword[h3]                   
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h3]                 ;2hh
+    push dword [h0]
+    push dword [h1]
+    push dword [h2]
+    push dword [edx + 32]
+    push dword 11
+    push dword 2272392833
+    call hh
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h2]                 ;3hh
+    push dword [h3]
+    push dword [h0]
+    push dword [h1]
+    push dword [edx + 44]
+    push dword 16
+    push dword 1839030562
+    call hh
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h1]                 ;4hh
+    push dword [h2]
+    push dword [h3]
+    push dword [h0]
+    push dword [edx + 56]
+    push dword 23
+    push dword 4259657740
+    call hh
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h0]                 ;5hh
+    push dword [h1]                 
+    push dword [h2]
+    push dword [h3]
+    push dword [edx + 4]                
+    push dword 4
+    push dword 2763975236           
+    call hh
+    pop dword[h3]                   
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h3]                 ;6hh
+    push dword [h0]
+    push dword [h1]
+    push dword [h2]
+    push dword [edx + 16]
+    push dword 11
+    push dword 1272893353
+    call hh
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h2]                 ;7hh
+    push dword [h3]
+    push dword [h0]
+    push dword [h1]
+    push dword [edx + 28]
+    push dword 16
+    push dword 4139469664
+    call hh
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h1]                 ;8hh
+    push dword [h2]
+    push dword [h3]
+    push dword [h0]
+    push dword [edx + 40]
+    push dword 23
+    push dword 3200236656
+    call hh
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h0]                 ;9hh
+    push dword [h1]                 
+    push dword [h2]
+    push dword [h3]
+    push dword [edx + 52]                
+    push dword 4
+    push dword 681279174           
+    call hh
+    pop dword[h3]                   
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h3]                 ;10hh
+    push dword [h0]
+    push dword [h1]
+    push dword [h2]
+    push dword [edx]
+    push dword 11
+    push dword 3936430074
+    call hh
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h2]                 ;11hh
+    push dword [h3]
+    push dword [h0]
+    push dword [h1]
+    push dword [edx + 12]
+    push dword 16
+    push dword 3572445317
+    call hh
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h1]                 ;12hh
+    push dword [h2]
+    push dword [h3]
+    push dword [h0]
+    push dword [edx + 18]
+    push dword 23
+    push dword 76029189
+    call hh
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h0]                 ;13hh
+    push dword [h1]                 
+    push dword [h2]
+    push dword [h3]
+    push dword [edx + 36]                
+    push dword 4
+    push dword 3654602809           
+    call hh
+    pop dword[h3]                   
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h3]                 ;14hh
+    push dword [h0]
+    push dword [h1]
+    push dword [h2]
+    push dword [edx + 48]
+    push dword 11
+    push dword 3873151461
+    call hh
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h2]                 ;15hh
+    push dword [h3]
+    push dword [h0]
+    push dword [h1]
+    push dword [edx + 60]
+    push dword 16
+    push dword 530742520
+    call hh
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h1]                 ;16hh
+    push dword [h2]
+    push dword [h3]
+    push dword [h0]
+    push dword [edx + 8]
+    push dword 23
+    push dword 3299628645
+    call hh
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h0]                 ;1ii
+    push dword [h1]                 
+    push dword [h2]
+    push dword [h3]
+    push dword [edx]                
+    push dword 6
+    push dword 4096336452           
+    call ii
+    pop dword[h3]                   
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h3]                 ;2ii
+    push dword [h0]
+    push dword [h1]
+    push dword [h2]
+    push dword [edx + 28]
+    push dword 10
+    push dword 1126891415
+    call ii
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h2]                 ;3ii
+    push dword [h3]
+    push dword [h0]
+    push dword [h1]
+    push dword [edx + 56]
+    push dword 15
+    push dword 2878612391
+    call ii
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h1]                 ;4ii
+    push dword [h2]
+    push dword [h3]
+    push dword [h0]
+    push dword [edx + 20]
+    push dword 21
+    push dword 4237533241
+    call ii
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h0]                 ;5ii
+    push dword [h1]                 
+    push dword [h2]
+    push dword [h3]
+    push dword [edx + 48]                
+    push dword 6
+    push dword 1700485571           
+    call ii
+    pop dword[h3]                   
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h3]                 ;6ii
+    push dword [h0]
+    push dword [h1]
+    push dword [h2]
+    push dword [edx + 12]
+    push dword 10
+    push dword 2399980690
+    call ii
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h2]                 ;7ii
+    push dword [h3]
+    push dword [h0]
+    push dword [h1]
+    push dword [edx + 40]
+    push dword 15
+    push dword 4293915773
+    call ii
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h1]                 ;8ii
+    push dword [h2]
+    push dword [h3]
+    push dword [h0]
+    push dword [edx + 4]
+    push dword 21
+    push dword 2240044497
+    call ii
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h0]                 ;9ii
+    push dword [h1]                 
+    push dword [h2]
+    push dword [h3]
+    push dword [edx + 32]                
+    push dword 6
+    push dword 1873313359           
+    call ii
+    pop dword[h3]                   
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h3]                 ;10ii
+    push dword [h0]
+    push dword [h1]
+    push dword [h2]
+    push dword [edx + 60]
+    push dword 10
+    push dword 4264355552
+    call ii
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h2]                 ;11ii
+    push dword [h3]
+    push dword [h0]
+    push dword [h1]
+    push dword [edx + 24]
+    push dword 15
+    push dword 2734768916
+    call ii
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h1]                 ;12ii
+    push dword [h2]
+    push dword [h3]
+    push dword [h0]
+    push dword [edx + 52]
+    push dword 21
+    push dword 1309151649
+    call ii
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h0]                 ;13ii
+    push dword [h1]                 
+    push dword [h2]
+    push dword [h3]
+    push dword [edx + 16]                
+    push dword 6
+    push dword 4149444226           
+    call ii
+    pop dword[h3]                   
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h3]                 ;14ii
+    push dword [h0]
+    push dword [h1]
+    push dword [h2]
+    push dword [edx + 44]
+    push dword 10
+    push dword 3174756917
+    call ii
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h2]                 ;15ii
+    push dword [h3]
+    push dword [h0]
+    push dword [h1]
+    push dword [edx + 8]
+    push dword 15
+    push dword 718787259
+    call ii
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    push dword [h1]                 ;16ii
+    push dword [h2]
+    push dword [h3]
+    push dword [h0]
+    push dword [edx + 36]
+    push dword 21
+    push dword 3951481745
+    call ii
+    pop dword[h3]
+    pop dword[h2]
+    pop dword[h1]
+    pop dword[h0]
+
+    
+
     sub dword [tlenght], 1
-    add edx, 64
-    jz foreachchunk64
+    add edx, 64                     ;move to the next 64 byte segment
+    jz foreachchunk64               ;keep doing it if there's more chunks to process
 
 appendhn:
 
@@ -174,6 +995,7 @@ print:
     int 80h
 
 ff:
+    pop esi                         ;saving return adress
     pop dword [ac]
     pop dword [s]
     pop dword [x]
@@ -211,9 +1033,12 @@ rotateleftf:
     push dword [c]
     push dword [d]
 
+    push esi                        ;return adress
     ret
 
 gg:
+    pop esi                         ;saving return adress
+
     pop dword [ac]
     pop dword [s]
     pop dword [x]
@@ -251,9 +1076,12 @@ rotateleftg:
     push dword [c]
     push dword [d]
 
+    push esi                        ;return adress
     ret
 
 hh:
+    pop esi                         ;saving return adress
+
     pop dword [ac]
     pop dword [s]
     pop dword [x]
@@ -287,10 +1115,13 @@ rotatelefth:
     push dword [b]
     push dword [c]
     push dword [d]
-
+    
+    push esi                        ;return adress
     ret
 
 ii:
+    pop esi                         ;saving return adress
+
     mov eax, dword [c]
     mov ebx, dword [b]
     not dword [d]
@@ -320,4 +1151,5 @@ rotatelefti:
     push dword [c]
     push dword [d]
 
+    push esi                        ;return adress
     ret
