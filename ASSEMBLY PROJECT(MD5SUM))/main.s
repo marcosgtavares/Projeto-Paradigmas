@@ -1,6 +1,8 @@
 SECTION .data
+test:           db 80h,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+
 SECTION .bss
-fileallocmem:   resb 2000000
+fileallocmem:   resb 20000000
 flenght:        resb 8
 inita:          resb 4
 initb:          resb 4
@@ -129,6 +131,9 @@ addbitlenght:
     mov [ecx], ebx
 
     mov edx, fileallocmem
+
+    mov edx, test
+    mov dword [tlenght], 1
 
 foreachchunk64:                     ;main loop for each 64 bytes
     mov edi, inita                  ;store hn values on registers 
@@ -909,6 +914,7 @@ charappendl:
 
 ff:                                 ;tranformation functions
     pop esi                         ;saving return adress
+
     pop dword [ac]
     pop dword [s]
     pop dword [x]
@@ -946,7 +952,7 @@ rotateleftf:
 
 gg:
     pop esi                         ;saving return adress
-
+    
     pop dword [ac]
     pop dword [s]
     pop dword [x]
@@ -957,9 +963,9 @@ gg:
 
     mov ebx, dword [b]
     and ebx, dword [d]
-    mov eax, dword [c]   
+    mov eax, dword [d]   
     not eax
-    and eax, dword [d]
+    and eax, dword [c]
     or eax, ebx
 
     add dword [a], eax
@@ -1020,6 +1026,14 @@ rotatelefth:
 ii:
     pop esi                         ;saving return adress
 
+    pop dword [ac]
+    pop dword [s]
+    pop dword [x]
+    pop dword [d]
+    pop dword [c]
+    pop dword [b]
+    pop dword [a]
+    
     mov eax, dword [c]
     mov ebx, dword [b]
     mov ecx, dword [d]
