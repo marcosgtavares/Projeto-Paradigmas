@@ -1,9 +1,10 @@
 SECTION .data
-test:           db 80h,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+test:           db 84 ,104 ,101 ,32 ,113 ,117 ,105 ,99 ,107 ,32 ,98 ,114, 111 ,119 ,110 ,32 ,102, 111, 120, 32 ,106, 117, 109, 112, 115, 32, 111, 118, 101, 114, 32, 116, 104 ,101 ,32 ,108 ,97 ,122 ,121 ,32 ,100 ,111 ,103,80h,0,0,0,0,0,0,0,0,0,0,0,0,88,1,0,0,0,0,0,0
+flenghtupper:   TIMES 4 db 0
 
 SECTION .bss
 fileallocmem:   resb 20000000
-flenght:        resb 8
+flenght:        resb 4
 inita:          resb 4
 initb:          resb 4
 initc:          resb 4
@@ -52,14 +53,14 @@ _start:
 
     add dword [tlenght], 1          ;add lenght in 64 bytes
 
-    add [flenght], eax              ;add lenght in bits
-    add [flenght], eax
-    add [flenght], eax
-    add [flenght], eax
-    add [flenght], eax
-    add [flenght], eax
-    add [flenght], eax
-    add [flenght], eax
+    add dword[flenght], eax              ;add lenght in bits
+    add dword[flenght], eax
+    add dword[flenght], eax
+    add dword[flenght], eax
+    add dword[flenght], eax
+    add dword[flenght], eax
+    add dword[flenght], eax
+    add dword[flenght], eax
 
     mov edi, 64
     cmp edi, eax
@@ -73,14 +74,14 @@ readalloc:                          ;read on allocated memory until the end
 
     add dword [tlenght], 1          ;add lenght in 64 bytes
 
-    add [flenght], eax              ;add lenght in bits
-    add [flenght], eax
-    add [flenght], eax
-    add [flenght], eax
-    add [flenght], eax
-    add [flenght], eax
-    add [flenght], eax
-    add [flenght], eax
+    add dword[flenght], eax              ;add lenght in bits
+    add dword[flenght], eax
+    add dword[flenght], eax
+    add dword[flenght], eax
+    add dword[flenght], eax
+    add dword[flenght], eax
+    add dword[flenght], eax
+    add dword[flenght], eax
 
     cmp edi, eax                     ;if read bytes are less than 64, go to padding
     jg padding
@@ -94,16 +95,18 @@ padding:
     jl complete3                    ;otherwise add to 64 and add 56
 
 complete:                           ;complete 56
-    mov edi, 55
+    mov edi, 56
     sub edi, eax
+    sub ecx, 8
     sub ecx, edi
     mov [ecx], byte 80h
     jmp looppad
 
 complete2:                          ;add 64
     add dword[tlenght], 1           ;add lenght in 64 bytes
-    sub ecx, 7
+    sub ecx, 8
     mov [ecx], byte 80h
+    sub ecx, 1
     mov edi, 63
     jmp looppad
 
@@ -122,18 +125,20 @@ looppad:                            ;add fisrt padding and loop for the rest
     sub edi, 1
     jmp looppad
 
+    
+
 addbitlenght:
-    add ecx, 1
+    
     mov ebx, dword[flenght]
     mov [ecx], ebx
-    add ecx, 4
-    mov ebx, dword[flenght+4]
-    mov [ecx], ebx
-
+    mov ebx, dword[flenghtupper]
+    mov [ecx+4], ebx
+    
     mov edx, fileallocmem
 
-    mov edx, test
-    mov dword [tlenght], 1
+    
+   
+    ;mov edx, test
 
 foreachchunk64:                     ;main loop for each 64 bytes
     mov edi, inita                  ;store hn values on registers 
