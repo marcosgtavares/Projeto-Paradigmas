@@ -101,6 +101,7 @@ complete:                           ;complete 56
     sub ecx, edi
     mov [ecx], byte 80h
     cmp eax, 55
+    sub edi, 1
     je addbitlenght
     jmp looppad
 
@@ -134,7 +135,7 @@ addbitlenght:
     mov ebx, dword[flenghtupper]
     mov [ecx+4], ebx
     
-    mov edx, fileallocmem
+    mov edx, fileallocmem   
 
     ;mov dword [tlenght], 2
     ;mov edx, test
