@@ -104,7 +104,7 @@ complete:                           ;complete 56
 
 complete2:                          ;add 64
     add dword[tlenght], 1           ;add lenght in 64 bytes
-    sub ecx, 8
+    sub ecx, 7
     mov [ecx], byte 80h
     sub ecx, 1
     mov edi, 63
@@ -588,7 +588,7 @@ foreachchunk64:                     ;main loop for each 64 bytes
     push dword [h2]
     push dword [h3]
     push dword [h0]
-    push dword [edx + 18]
+    push dword [edx + 24]
     push dword 23
     push dword 76029189
     call hh
