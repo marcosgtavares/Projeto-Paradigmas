@@ -1,5 +1,5 @@
 SECTION .data
-test:           db 84 ,104 ,101 ,32 ,113 ,117 ,105 ,99 ,107 ,32 ,98 ,114, 111 ,119 ,110 ,32 ,102, 111, 120, 32 ,106, 117, 109, 112, 115, 32, 111, 118, 101, 114, 32, 116, 104 ,101 ,32 ,108 ,97 ,122 ,121 ,32 ,100 ,111 ,103,80h,0,0,0,0,0,0,0,0,0,0,0,0,88,1,0,0,0,0,0,0
+test:           db 97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,115,115,115,115,115,115,115,115,115,115,49,53,54,51,50,57,55,54,56,49,56,52,53,49,54,53,54,54,53,115,80h,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,192,1,0,0,0,0,0,0
 flenghtupper:   TIMES 4 db 0
 
 SECTION .bss
@@ -100,13 +100,14 @@ complete:                           ;complete 56
     sub ecx, 8
     sub ecx, edi
     mov [ecx], byte 80h
+    cmp eax, 55
+    je addbitlenght
     jmp looppad
 
 complete2:                          ;add 64
     add dword[tlenght], 1           ;add lenght in 64 bytes
-    sub ecx, 7
+    sub ecx, 8
     mov [ecx], byte 80h
-    sub ecx, 1
     mov edi, 63
     jmp looppad
 
@@ -119,16 +120,15 @@ complete3:                          ;otherwise add to 64 and add 56
     add edi, 55
 
 looppad:                            ;add fisrt padding and loop for the rest
-    jz addbitlenght
     add ecx, 1
     mov [ecx], byte 0
     sub edi, 1
-    jmp looppad
+    jnz looppad
 
     
 
 addbitlenght:
-    
+    add ecx, 1
     mov ebx, dword[flenght]
     mov [ecx], ebx
     mov ebx, dword[flenghtupper]
@@ -136,8 +136,7 @@ addbitlenght:
     
     mov edx, fileallocmem
 
-    
-   
+    ;mov dword [tlenght], 2
     ;mov edx, test
 
 foreachchunk64:                     ;main loop for each 64 bytes
