@@ -68,6 +68,7 @@ digest:         resb 32
 fileonstack:    resb 400
 noffilesonst:   resb 4
 lastposst:      resb 4
+fileiterator:   resb 4
 
 SECTION .text
 global _start
@@ -98,15 +99,6 @@ iterarg:
     sub esi, 1
     jnz iterarg                             ;no flag (has -) processed so it repeats until there are no more args to process 
 
-    mov bl, byte[binf]                      ;if bin is activated, deactivate text
-    not bl
-    mov al, byte[textbinf]
-    and al, bl
-    mov byte[textbinf], al
-
-    cmp dword [arglen], 1                   ;if arglen is only one it means there are no more arguments on the stack to process
-    je nofile
-
 nohver:                                     ;no help and version flags found(input or file)
     cmp byte[checkf], 0                     ;checking if the flag check was activated
     je onlyc
@@ -124,7 +116,14 @@ onlyc:                                      ;in case it was activated, check for
     cmp byte[strictf], 255
     je printstricerr
 
-    mov ebx, dword[fileonstack]             ;passing the file string adress through ebx register(so i don't meddle with the stack)
+    mov dword[fileiterator], 0
+
+loopfile:
+    
+    add dword[fileiterator], 4
+    mov esi, dword[fileiterator]
+    mov edi, fileonstack
+    mov ebx, [edi + esi -4]                 ;passing the file string adress through ebx register(so i don't meddle with the stack)
     jmp md5                                 ;jump to md5 label(it will be acting as a function)
 
 printres:
@@ -156,23 +155,23 @@ printnoast:                                 ;if yes, print double space
     int 80h
 
 printfname:
-    mov edi, dword[fileonstack]             ;save the file name string adress on edi so that whe can discover its size
-    mov esi, 0
+    mov esi, dword[fileiterator]
+    mov edi, fileonstack
+    mov ecx, [edi + esi - 4]             ;save the file name string adress on edi so that whe can discover its size
+    mov edx, 0
 
 namesizeloop:
-    add esi, 1
-    cmp byte[edi + esi -1], 0
+    add edx, 1
+    cmp byte[ecx + edx - 1], 0
     jnz namesizeloop
-    dec esi
+    dec edx
 
     mov eax, 4
     mov ebx, 1
-    mov ecx, edi                            ;print the file name
-    mov edx, esi
     int 80h
 
     cmp byte[zerof], 255                    ;check if zero flag was activated
-    je end
+    je nonwln
 
     mov eax, 4
     mov ebx, 1
@@ -181,6 +180,10 @@ namesizeloop:
     mov edx, 1
     int 80h
 
+nonwln:
+    mov esi, dword[fileiterator]
+    cmp esi, dword[noffilesonst]
+    jnz loopfile
     jmp end
 
 printbsd:
@@ -264,11 +267,25 @@ cont:                                       ;checking for ambguity error(t case)
     je printambterr
 
 cont2:                                      ;atributes value to the flag stored on ecx
+    cmp ecx, binf
+    je deacttext
+    cmp ecx, textbinf
+    je deactbin
+    
+afterdeact:
     mov [ecx], byte 255
 
 cont3:
     sub dword [arglen], 1                   ;decreases the number of arguments to deal with
     jmp retiter
+
+deacttext:                                  ;deactivate text flag in bin flag is activated
+    mov dword[textbinf], 0
+    jmp afterdeact
+
+deactbin:                                   ;deactivate bin flag in text flag is activated
+    mov dword[binf], 0
+    jmp afterdeact
 
 twominus:                                   ;if two minus are found(on the same label where the simple cases are checked)
     mov ebx, 1
