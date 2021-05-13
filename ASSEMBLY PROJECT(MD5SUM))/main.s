@@ -95,6 +95,7 @@ iterarg:
     add dword[noffilesonst], 4              
     add edi, 4
     sub esi, 1
+    sub dword [arglen], 1
     jnz iterarg                             ;no flag (has -) processed so it repeats until there are no more args to process 
 
     mov bl, byte[binf]                      ;if bin is activated, deactivate text
