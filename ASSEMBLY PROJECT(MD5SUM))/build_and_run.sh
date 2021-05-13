@@ -19,5 +19,3 @@ nasm -f elf $source
 # Linka o código para sistemas de 64 bits 
 ld -m elf_i386 $output.o -o $output
 
-# Executa o programa gerado
-./$output

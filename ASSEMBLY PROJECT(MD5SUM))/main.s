@@ -41,6 +41,8 @@ printstricerrt: db 109,100,53,115,117,109,58,32,116,104,101,32,45,45,115,116,114
 invalidoptt:    db 109,100,53,115,117,109,58,32,105,110,118,97,108,105,100,32,111,112,116,105,111,110,32,45,45,32,39
 urecoptt:       db 109,100,53,115,117,109,58,32,117,110,114,101,99,111,103,110,105,122,101,100,32,111,112,116,105,111,110,32,39
 tryformore:     db 39,10,84,114,121,32,39,109,100,53,115,117,109,32,45,45,104,101,108,112,39,32,102,111,114,32,109,111,114,101,32,105,110,102,111,114,109,97,116,105,111,110,46,10
+doublespace:    db 32,32,10
+spaceaster:     db 32,42
 
 SECTION .bss
 fileallocmem:   resb 20000000
@@ -63,41 +65,50 @@ ac:             resb 4
 tlenght:        resb 4    
 arglen:         resb 4
 digest:         resb 32
+fileonstack:    resb 400
+noffilesonst:   resb 4
+lastposst:      resb 4
 
 SECTION .text
 global _start
 
 _start:
-pop dword [arglen]
+pop dword [arglen]                          ;arguments to process
+mov dword[noffilesonst], 0                  ;files on the stack 
+mov dword[lastposst], esp                   ;last position on stack. Saving it so that i can recover it afer processing the flags(it will use the register i was using)
 
 retiter:
-    cmp dword [arglen], 1
-    je nofile
+    cmp dword [arglen], 1                   ;if arglen is only one it means there are no more arguments on the stack to process
+    je nofile                               
     mov esi, dword [arglen]
     sub esi, 1
-    mov edi, esp
+    mov edi, dword[lastposst]               ;passing last positon
     add edi, 4
-
 iterarg:
     mov eax, dword[edi]
-    cmp byte[eax], 2dh
-    je flagproc
+    mov dword[lastposst], edi               ;saving last position
+    cmp byte[eax], 2dh                      ;checking for -
+    je flagproc                             ;jump to the label where i process the argument if it starts with -
+    mov ebx, dword[noffilesonst]    
+    mov ecx, [edi]
+    mov dword[fileonstack + ebx], ecx       ;saving the adress of the string with the file name 
+    add dword[noffilesonst], 4              
     add edi, 4
     sub esi, 1
-    jnz iterarg
+    jnz iterarg                             ;no flag (has -) processed so it repeats until there are no more args to process 
 
-    mov bl, byte[binf] 
+    mov bl, byte[binf]                      ;if bin is activated, deactivate text
     not bl
     mov al, byte[textbinf]
     and al, bl
     mov byte[textbinf], al
 
-nohver:    
-    cmp byte[checkf], 0
+nohver:                                     ;no help and version flags found(input or file)
+    cmp byte[checkf], 0                     ;checking if the flag check was activated
     je onlyc
     ja onlygen
 
-onlyc:
+onlyc:                                      ;in case it was activated, check for flag errors
     cmp byte[ignoremissingf], 255
     je printignerr
     cmp byte[statusf], 255
@@ -109,9 +120,67 @@ onlyc:
     cmp byte[strictf], 255
     je printstricerr
 
+    mov ebx, dword[fileonstack]             ;passing the file string adress through ebx register(so i don't meddle with the stack)
+    jmp md5                                 ;jump to md5 label(it will be acting as a function)
+
+printres:
+    cmp byte[tagf], 255                     ;check if the flag tag was activated
+    je printbsd
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, digest                         ;if not, print the digest(result of md5)
+    mov edx, 32
+    int 80h
+
+    cmp byte[textbinf], 255                 ;check if text is activated
+    je printnoast
+    mov eax, 4                  
+    mov ebx, 1
+    mov ecx, spaceaster                     ;if not, print asterisk and space
+    mov edx, 2
+    int 80h
+    
     jmp end
 
-onlygen:
+printnoast:                                 ;if yes, print double space
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, doublespace
+    mov edx, 2
+    int 80h
+
+printfname:
+    mov edi, dword[fileonstack]             ;save the file name string adress on edi so that whe can discover its size
+    mov esi, 0
+
+namesizeloop:
+    add esi, 1
+    cmp byte[edi + esi -1], 0
+    jnz namesizeloop
+    dec esi
+
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, edi                            ;print the file name
+    mov edx, esi
+    int 80h
+
+    cmp byte[zerof], 255                    ;check if zero flag was activated
+    je end
+
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, doublespace                    ;if not, print \n (found on the same string as the two spaces)
+    add ecx, 2
+    mov edx, 1
+    int 80h
+
+    jmp end
+
+printbsd:
+    jmp end
+
+onlygen:                                    ;in case check flag was activated, check for flag errors
     cmp byte[zerof], 255
     je printzerr
     cmp byte[tagf], 255
@@ -123,7 +192,7 @@ onlygen:
 
     jmp end
 
-flagproc:
+flagproc:                                   ;checks the simple case for the flags with one -
     cmp byte[eax + 1], 2dh
     je twominus
     cmp byte[eax + 1], 98
@@ -142,13 +211,13 @@ flagproc:
     mov ecx, warnf
     je popiterone
     mov esi, 1
-    jmp unknown2
+    jmp unknown2                            ;if it's unknown, go to the label where the error is printed
 
-popiterone:
+popiterone:                                 ;checking if its the simple case again
     cmp byte[eax + 2], 0
     je popiter
     mov esi, 0
-bctzloop:
+bctzloop:                                   ;if it is not, do the complex case(multiple flags on the same -)
     inc esi
     cmp byte[eax + esi], 98
     mov ecx, binf
@@ -167,13 +236,13 @@ bctzloop:
     je concatflag
     cmp byte[eax + esi], 0
     je cont3
-    jmp unknown2
+    jmp unknown2                            ;if unknown is found, print error
 
 concatflag:
-    mov byte[ecx], 255
+    mov byte[ecx], 255                      ;used to atribute value to the flag variables
     jmp bctzloop
         
-popiter:
+popiter:                                    ;checking for ambiguity error(st case)
     cmp byte[eax + 2], 115
     jne cont
     cmp byte[eax + 3], 0
@@ -182,31 +251,30 @@ popiter:
     je printamberr1
     jmp cont2
 
-cont:
+cont:                                       ;checking for ambguity error(t case)
     cmp byte[eax + 2], 116
     jne cont2
     cmp byte[eax + 3], 0
     je printambterr
 
-cont2:
-    pop eax
+cont2:                                      ;atributes value to the flag stored on ecx
     mov [ecx], byte 255
 
 cont3:
-    sub dword [arglen], 1
+    sub dword [arglen], 1                   ;decreases the number of arguments to deal with
     jmp retiter
 
-twominus:
+twominus:                                   ;if two minus are found(on the same label where the simple cases are checked)
     mov ebx, 1
 
-checkloop:
+checkloop:                                  ;there's one of these loops or each flag with --
     inc ebx
     mov cl, byte[flagbintext + ebx - 2] 
     cmp byte[eax + ebx], cl
     je checkloop
     cmp byte[eax + ebx], 0
-    mov ecx, binf
-    je popiter
+    mov ecx, binf                           ;save the values of the flag on ecx
+    je popiter                              ;jump to popiter label if there where no problems with the flag, there it will be checked for ambiguity and assigned value if no errors are found 
 
     mov ebx, 1
 checkloop2:
@@ -322,9 +390,9 @@ checkloop12:
     je checkloop12
     cmp byte[eax + ebx], 0
     mov ecx, versionf
-    je versionprint
+    je versionprint                                     ;if goes through all the loops without being processed, it's and unknown flag
 
-unknown:
+unknown:                                                ;when an unknown -- flag is found, the error is processed here
     mov esi, 1
 
 findssize:
@@ -356,7 +424,7 @@ findssize:
     mov ebx, 0
     int 80h
     
-unknown2:
+unknown2:                                               ;here the - flags unknown errors are processed
 
     mov edi, eax
     add edi, esi
@@ -383,14 +451,14 @@ unknown2:
     mov ebx, 0
     int 80h
 
-nofile:
+nofile:                                                 ;if there's no more arguments on the stack, it comes here to check for help and version flags
     cmp byte[helpf], 255
     je helpprint
     cmp byte[versionf], 255
     je versionprint
     jmp nohver
 
-helpprint:
+helpprint:                                              ;labels where the error are printed
     mov ecx, helpprinttext
     mov eax, 4
     mov ebx, 1
@@ -533,7 +601,7 @@ printstricerr:
     mov ebx, 0
     int 80h
 
-end:
+end:                                ;end label
     mov eax, 1
     mov ebx, 0
     int 80h
@@ -546,7 +614,6 @@ md5:
     mov dword [tlenght], 0
 
     mov eax, 5                      ;open file 
-    mov ebx, [esp + 8]
     mov ecx, 0
     mov edx, 0644o
     int 80h
@@ -1382,16 +1449,7 @@ digestloop3:
     sub esi, 1
     jnz digestloop3
 
-print:
-    mov eax, 4
-    mov ebx, 1
-    mov ecx, digest
-    mov edx, 32
-    int 80h
-   
-    mov eax, 1
-    mov ebx, 0
-    int 80h
+    jmp printres
 
 
 to2characters:                      ;transform a byte in 2 hex caracters
