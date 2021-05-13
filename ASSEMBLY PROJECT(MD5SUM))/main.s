@@ -3,7 +3,7 @@ test:           db 97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,
 flenghtupper:   TIMES 4 db 0
 checkf:         db 0
 tagf:           db 0
-textbinf:       db 255
+textbinf:       db 254
 zerof:          db 0
 ignoremissingf: db 0
 quietf:         db 0
@@ -137,6 +137,8 @@ printres:
     int 80h
 
     cmp byte[textbinf], 255                 ;check if text is activated
+    je printnoast
+    cmp byte[textbinf], 254                 ;check if text standard is activated
     je printnoast
     mov eax, 4                  
     mov ebx, 1
