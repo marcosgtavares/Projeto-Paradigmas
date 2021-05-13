@@ -94,8 +94,8 @@ iterarg:
     mov dword[fileonstack + ebx], ecx       ;saving the adress of the string with the file name 
     add dword[noffilesonst], 4              
     add edi, 4
-    sub esi, 1
     sub dword [arglen], 1
+    sub esi, 1
     jnz iterarg                             ;no flag (has -) processed so it repeats until there are no more args to process 
 
     mov bl, byte[binf]                      ;if bin is activated, deactivate text
@@ -103,6 +103,9 @@ iterarg:
     mov al, byte[textbinf]
     and al, bl
     mov byte[textbinf], al
+
+    cmp dword [arglen], 1                   ;if arglen is only one it means there are no more arguments on the stack to process
+    je nofile
 
 nohver:                                     ;no help and version flags found(input or file)
     cmp byte[checkf], 0                     ;checking if the flag check was activated
