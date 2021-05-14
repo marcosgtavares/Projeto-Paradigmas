@@ -38,11 +38,16 @@ printstaerrt:   db 109,100,53,115,117,109,58,32,116,104,101,32,45,45,115,116,97,
 printquierrt:   db 109,100,53,115,117,109,58,32,116,104,101,32,45,45,113,117,105,101,116,32,111,112,116,105,111,110,32,105,115,32,109,101,97,110,105,110,103,102,117,108,32,111,110,108,121,32,119,104,101,110,32,118,101,114,105,102,121,105,110,103,32,99,104,101,99,107,115,117,109,115,10,84,114,121,32,39,109,100,53,115,117,109,32,45,45,104,101,108,112,39,32,102,111,114,32,109,111,114,101,32,105,110,102,111,114,109,97,116,105,111,110,46,10
 printwarerrt:   db 109,100,53,115,117,109,58,32,116,104,101,32,45,45,119,97,114,110,32,111,112,116,105,111,110,32,105,115,32,109,101,97,110,105,110,103,102,117,108,32,111,110,108,121,32,119,104,101,110,32,118,101,114,105,102,121,105,110,103,32,99,104,101,99,107,115,117,109,115,10,84,114,121,32,39,109,100,53,115,117,109,32,45,45,104,101,108,112,39,32,102,111,114,32,109,111,114,101,32,105,110,102,111,114,109,97,116,105,111,110,46,10
 printstricerrt: db 109,100,53,115,117,109,58,32,116,104,101,32,45,45,115,116,114,105,99,116,32,111,112,116,105,111,110,32,105,115,32,109,101,97,110,105,110,103,102,117,108,32,111,110,108,121,32,119,104,101,110,32,118,101,114,105,102,121,105,110,103,32,99,104,101,99,107,115,117,109,115,10,84,114,121,32,39,109,100,53,115,117,109,32,45,45,104,101,108,112,39,32,102,111,114,32,109,111,114,101,32,105,110,102,111,114,109,97,116,105,111,110,46,10
+printtxtsuperrt:db 109,100,53,115,117,109,58,32,45,45,116,97,103,32,100,111,101,115,32,110,111,116,32,115,117,112,112,111,114,116,32,45,45,116,101,120,116,32,109,111,100,101,10,84,114,121,32,39,109,100,53,115,117,109,32,45,45,104,101,108,112,39,32,102,111,114,32,109,111,114,101,32,105,110,102,111,114,109,97,116,105,111,110,46,10
+printnfilerrort:db 109,100,53,115,117,109,58,32
+printnfilerr2rt:db 58,32,78,111,32,115,117,99,104,32,102,105,108,101,32,111,114,32,100,105,114,101,99,116,111,114,121,10
 invalidoptt:    db 109,100,53,115,117,109,58,32,105,110,118,97,108,105,100,32,111,112,116,105,111,110,32,45,45,32,39
 urecoptt:       db 109,100,53,115,117,109,58,32,117,110,114,101,99,111,103,110,105,122,101,100,32,111,112,116,105,111,110,32,39
 tryformore:     db 39,10,84,114,121,32,39,109,100,53,115,117,109,32,45,45,104,101,108,112,39,32,102,111,114,32,109,111,114,101,32,105,110,102,111,114,109,97,116,105,111,110,46,10
 doublespace:    db 32,32,10
 spaceaster:     db 32,42
+bsd1:           db 77,68,53,32,40
+bsd2:           db 41,32,61,32
 
 SECTION .bss
 fileallocmem:   resb 20000000
@@ -105,6 +110,13 @@ nohver:                                     ;no help and version flags found(inp
     ja onlygen
 
 onlyc:                                      ;in case it was activated, check for flag errors
+    cmp byte[tagf], 255
+    jnz chcktxtnsuperr
+
+    cmp byte[textbinf], 255
+    je printtxtsuperr
+
+chcktxtnsuperr:
     cmp byte[ignoremissingf], 255
     je printignerr
     cmp byte[statusf], 255
@@ -115,11 +127,10 @@ onlyc:                                      ;in case it was activated, check for
     je printwarerr
     cmp byte[strictf], 255
     je printstricerr
-
+    
     mov dword[fileiterator], 0
 
 loopfile:
-    
     add dword[fileiterator], 4
     mov esi, dword[fileiterator]
     mov edi, fileonstack
@@ -145,7 +156,7 @@ printres:
     mov edx, 2
     int 80h
     
-    jmp end
+    jmp nodoublespace
 
 printnoast:                                 ;if yes, print double space
     mov eax, 4
@@ -154,7 +165,7 @@ printnoast:                                 ;if yes, print double space
     mov edx, 2
     int 80h
 
-printfname:
+nodoublespace:
     mov esi, dword[fileiterator]
     mov edi, fileonstack
     mov ecx, [edi + esi - 4]             ;save the file name string adress on edi so that whe can discover its size
@@ -187,6 +198,53 @@ nonwln:
     jmp end
 
 printbsd:
+    mov eax, 4                  
+    mov ebx, 1
+    mov ecx, bsd1
+    mov edx, 5
+    int 80h
+
+    mov esi, dword[fileiterator]
+    mov edi, fileonstack
+    mov ecx, [edi + esi - 4]             ;save the file name string adress on edi so that whe can discover its size
+    mov edx, 0
+
+namesizeloopbsd:
+    add edx, 1
+    cmp byte[ecx + edx - 1], 0
+    jnz namesizeloopbsd
+    dec edx
+
+    mov eax, 4
+    mov ebx, 1
+    int 80h
+
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, bsd2
+    mov edx, 5
+    int 80h
+
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, digest                         ;if not, print the digest(result of md5)
+    mov edx, 32
+    int 80h
+
+    cmp byte[zerof], 255
+    je nonwlnbsd
+
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, doublespace                    ;if not, print \n (found on the same string as the two spaces)
+    add ecx, 2
+    mov edx, 1
+    int 80h    
+
+nonwlnbsd:
+    mov esi, dword[fileiterator]
+    cmp esi, dword[noffilesonst]
+    jnz loopfile
     jmp end
 
 onlygen:                                    ;in case check flag was activated, check for flag errors
@@ -248,6 +306,12 @@ bctzloop:                                   ;if it is not, do the complex case(m
     jmp unknown2                            ;if unknown is found, print error
 
 concatflag:
+    cmp ecx, binf
+    je deacttextcplx
+    cmp ecx, textbinf
+    je deactbincplx
+
+afterdeactcplx:
     mov byte[ecx], 255                      ;used to atribute value to the flag variables
     jmp bctzloop
         
@@ -267,15 +331,15 @@ cont:                                       ;checking for ambguity error(t case)
     je printambterr
 
 cont2:                                      ;atributes value to the flag stored on ecx
+    mov [ecx], byte 255
+
+cont3:
     cmp ecx, binf
     je deacttext
     cmp ecx, textbinf
     je deactbin
-    
-afterdeact:
-    mov [ecx], byte 255
 
-cont3:
+afterdeact:
     sub dword [arglen], 1                   ;decreases the number of arguments to deal with
     jmp retiter
 
@@ -286,6 +350,14 @@ deacttext:                                  ;deactivate text flag in bin flag is
 deactbin:                                   ;deactivate bin flag in text flag is activated
     mov dword[binf], 0
     jmp afterdeact
+
+deacttextcplx:                                  ;deactivate text flag in bin flag is activated
+    mov dword[textbinf], 0
+    jmp afterdeactcplx
+
+deactbincplx:                                   ;deactivate bin flag in text flag is activated
+    mov dword[binf], 0
+    jmp afterdeactcplx
 
 twominus:                                   ;if two minus are found(on the same label where the simple cases are checked)
     mov ebx, 1
@@ -624,6 +696,46 @@ printstricerr:
     mov ebx, 0
     int 80h
 
+printtxtsuperr:
+    mov ecx, printtxtsuperrt
+    mov eax, 4
+    mov ebx, 1
+    mov edx, 85
+    int 80h
+
+    mov eax, 1
+    mov ebx, 0
+    int 80h
+
+printnfilerror:
+    mov esi, ebx
+
+    mov ecx, printnfilerrort
+    mov eax, 4
+    mov ebx, 1
+    mov edx, 8
+    int 80h
+
+    mov ecx, esi
+    mov edx, 0
+nslooperr:
+    add edx, 1
+    cmp byte[ecx + edx - 1], 0
+    jnz nslooperr
+    dec edx
+
+    mov eax, 4
+    mov ebx, 1
+    int 80h
+
+    mov ecx, printnfilerr2rt
+    mov eax, 4
+    mov ebx, 1
+    mov edx, 28
+    int 80h
+
+    jmp nonwln
+
 end:                                ;end label
     mov eax, 1
     mov ebx, 0
@@ -641,6 +753,8 @@ md5:
     mov edx, 0644o
     int 80h
 
+    cmp eax, 0
+    jl printnfilerror               ;error caused by unknown file, it prints the error and iterates on the files to be processed
 
     mov ebx, eax                    ;read 512bit from the file if possible
     mov eax, 3
