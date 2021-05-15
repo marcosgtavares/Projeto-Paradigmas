@@ -13,6 +13,8 @@ warnf:          db 0
 helpf:          db 0
 versionf:       db 0
 binf:           db 0
+onespacef:      db 0
+fendedf:        db 0
 flagbintext:    db 'binary', 255
 flagchecktext:  db 'check', 255
 flagtagtext:    db 'tag', 255
@@ -48,6 +50,8 @@ doublespace:    db 32,32,10
 spaceaster:     db 32,42
 bsd1:           db 77,68,53,32,40
 bsd2:           db 41,32,61,32
+okchkmes:       db 58,32,79,75,10
+failchkmes:     db 58,32,70,65,73,76,69,68,10
 
 SECTION .bss
 fileallocmem:   resb 20000000
@@ -74,6 +78,9 @@ fileonstack:    resb 400
 noffilesonst:   resb 4
 lastposst:      resb 4
 fileiterator:   resb 4
+hashand2spaces: resb 34
+filetohashcheck:resb 255
+chkdfilesiz:    resb 4
 
 SECTION .text
 global _start
@@ -191,7 +198,7 @@ namesizeloop:
     mov edx, 1
     int 80h
 
-nonwln:
+nonwln:                                     ;finishes the current iteration
     mov esi, dword[fileiterator]
     cmp esi, dword[noffilesonst]
     jnz loopfile
@@ -257,6 +264,175 @@ onlygen:                                    ;in case check flag was activated, c
     cmp byte[textbinf], 255
     je printbterr
 
+    mov dword[fileiterator], 0
+
+loopfilechk:
+    add dword[fileiterator], 4
+    mov esi, dword[fileiterator]
+    mov edi, fileonstack
+    mov ebx, [edi + esi -4]                 ;passing the file string adress through ebx register(so i don't meddle with the stack)
+
+    mov eax, 5                              ;open file 
+    mov ecx, 0
+    mov edx, 0644o
+    int 80h
+
+    mov ebx, eax                    
+
+nwlnloop:    
+    mov esi, 0
+    mov ecx, hashand2spaces
+    inc esi
+    mov eax, 3
+    mov edx, 1
+    int 80h
+
+    cmp eax, 0
+    je chkformorefls
+
+    cmp byte[ecx], 102                       ;checks for chracters that are not representations of hexadecimal numbers
+    jg impformerr
+    cmp byte[ecx], 97
+    jge keepreahashout
+    cmp byte[ecx], 57
+    jg impformerr
+    cmp byte[ecx], 48
+    jl impformerr
+
+keepreahashout:
+    add ecx, 1
+
+readhash:                                   ;read from file character by character to search for improperly formated lines
+    inc esi
+    mov eax, 3
+    mov edx, 1
+    int 80h
+
+    cmp byte[ecx], 102                       ;checks for chracters that are not representations of hexadecimal numbers
+    jg impformerr
+    cmp byte[ecx], 97
+    jge keepreahash
+    cmp byte[ecx], 57
+    jg impformerr
+    cmp byte[ecx], 48
+    jl impformerr
+
+keepreahash:
+    add ecx, 1
+    cmp esi, 32
+    je hashcorrect
+    jmp readhash
+
+hashcorrect:
+    mov eax, 3
+    mov edx, 1
+    int 80h
+
+    add ecx, 1
+
+    cmp eax, 0
+    je impformerr
+
+    cmp byte[hashand2spaces + 32], 32
+    jne impformerr
+
+    cmp byte[onespacef], 255
+    je readfilechk
+
+    mov eax, 3
+    mov edx, 1
+    int 80h
+
+    cmp eax, 0
+    je impformerr
+
+    cmp byte[hashand2spaces + 33], 32
+    je readfilechk
+    cmp byte[hashand2spaces + 33], 42
+    je readfilechk
+    cmp byte[hashand2spaces + 33], 10
+    je readfilechk
+    mov byte[onespacef], 255
+    mov ah, byte[hashand2spaces + 33]
+    mov byte[filetohashcheck], ah
+    mov esi, filetohashcheck
+    add esi, 1
+    jmp readfrom0
+
+readfilechk:
+    mov esi, filetohashcheck
+    
+readfrom0:
+    mov eax, 3
+    mov ecx, esi
+    mov edx, 1
+    int 80h
+
+    add esi, 1
+    cmp eax, 0
+    je fended
+    cmp byte[esi -1], 10
+    jne readfrom0
+
+aftfended:    
+    mov byte[esi -1], 0
+    sub esi, filetohashcheck
+    mov dword[chkdfilesiz], esi
+    mov dword[lastposst], ebx
+    mov ebx, filetohashcheck
+
+    jmp md5
+
+fended:
+    mov byte[fendedf], 255
+    jmp aftfended
+
+printrescheck:
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, filetohashcheck
+    mov edx, dword[chkdfilesiz]
+    sub edx, 1
+    int 80h
+
+    mov esi, 0
+    mov eax, digest
+    mov ebx, hashand2spaces
+
+checkhshmatch:
+    inc esi
+    mov ch, byte[ebx + esi -1]
+    cmp byte[eax + esi -1], ch
+    jne failedcheck
+    cmp esi, 32
+    jl checkhshmatch
+
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, okchkmes
+    mov edx, 5
+    int 80h
+
+    jmp chkformorelns
+
+failedcheck:   
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, failchkmes
+    mov edx, 9
+    int 80h
+
+chkformorelns:
+    cmp byte[fendedf], 255
+    je chkformorefls
+    mov ebx, dword[lastposst]
+    jmp nwlnloop
+
+chkformorefls:
+    mov byte[fendedf], 0
+    mov esi, dword[fileiterator]
+    cmp esi, dword[noffilesonst]
+    jnz loopfilechk
     jmp end
 
 flagproc:                                   ;checks the simple case for the flags with one -
@@ -578,7 +754,7 @@ versionprint:
 printamberr1:
     mov ecx, printamberr1t
     mov eax, 4
-    mov ebx, 1
+    mov ebx, 2
     mov edx, 115
     int 80h
 
@@ -589,7 +765,7 @@ printamberr1:
 printamberr2:
     mov ecx, printamberr2t
     mov eax, 4
-    mov ebx, 1
+    mov ebx, 2
     mov edx, 114
     int 80h
 
@@ -600,7 +776,7 @@ printamberr2:
 printambterr:
     mov ecx, printambterrt
     mov eax, 4
-    mov ebx, 1
+    mov ebx, 2
     mov edx, 109
     int 80h
 
@@ -611,7 +787,7 @@ printambterr:
 printzerr:
     mov ecx, printzerrt
     mov eax, 4
-    mov ebx, 1
+    mov ebx, 2
     mov edx, 110
     int 80h
 
@@ -622,7 +798,7 @@ printzerr:
 printtagerr:
     mov ecx, printtagerrt
     mov eax, 4
-    mov ebx, 1
+    mov ebx, 2
     mov edx, 109
     int 80h
 
@@ -633,7 +809,7 @@ printtagerr:
 printbterr:
     mov ecx, printbterrt
     mov eax, 4
-    mov ebx, 1
+    mov ebx, 2
     mov edx, 123
     int 80h
 
@@ -644,7 +820,7 @@ printbterr:
 printignerr:
     mov ecx, printignerrt
     mov eax, 4
-    mov ebx, 1
+    mov ebx, 2
     mov edx, 123
     int 80h
 
@@ -655,7 +831,7 @@ printignerr:
 printstaerr:
     mov ecx, printstaerrt
     mov eax, 4
-    mov ebx, 1
+    mov ebx, 2
     mov edx, 114
     int 80h
 
@@ -666,7 +842,7 @@ printstaerr:
 printquierr:
     mov ecx, printquierrt
     mov eax, 4
-    mov ebx, 1
+    mov ebx, 2
     mov edx, 113
     int 80h
 
@@ -677,7 +853,7 @@ printquierr:
 printwarerr:
     mov ecx, printwarerrt
     mov eax, 4
-    mov ebx, 1
+    mov ebx, 2
     mov edx, 112
     int 80h
 
@@ -688,7 +864,7 @@ printwarerr:
 printstricerr:
     mov ecx, printstricerrt
     mov eax, 4
-    mov ebx, 1
+    mov ebx, 2
     mov edx, 114
     int 80h
 
@@ -699,7 +875,7 @@ printstricerr:
 printtxtsuperr:
     mov ecx, printtxtsuperrt
     mov eax, 4
-    mov ebx, 1
+    mov ebx, 2
     mov edx, 85
     int 80h
 
@@ -712,7 +888,7 @@ printnfilerror:
 
     mov ecx, printnfilerrort
     mov eax, 4
-    mov ebx, 1
+    mov ebx, 2
     mov edx, 8
     int 80h
 
@@ -725,16 +901,26 @@ nslooperr:
     dec edx
 
     mov eax, 4
-    mov ebx, 1
+    mov ebx, 2
     int 80h
 
     mov ecx, printnfilerr2rt
     mov eax, 4
-    mov ebx, 1
+    mov ebx, 2
     mov edx, 28
     int 80h
 
     jmp nonwln
+
+impformerr:
+    ;mov ecx, hashand2spaces
+    ;mov eax, 4
+    ;mov ebx, 2
+    ;mov edx, 32
+    ;int 80h
+
+
+    ;jmp nwlnloop
 
 end:                                ;end label
     mov eax, 1
@@ -1586,6 +1772,8 @@ digestloop3:
     sub esi, 1
     jnz digestloop3
 
+    cmp byte[checkf], 255           ;if flag check is activated, jump to the loop where the answer is generated for check, if not, go to where the answer is generated for hash creation 
+    je printrescheck
     jmp printres
 
 
