@@ -71,6 +71,7 @@ bsd1:           db 77,68,53,32,40
 bsd2:           db 41,32,61,32
 okchkmes:       db 58,32,79,75,10
 failchkmes:     db 58,32,70,65,73,76,69,68,10
+sntdrinpt:      db 39,115,116,97,110,100,97,114,100,32,105,110,112,117,116,39,0
 
 SECTION .bss
 fileallocmem:   resb 20000000
@@ -122,8 +123,12 @@ retiter:
 iterarg:
     mov eax, dword[edi]
     mov dword[lastposst], edi               ;saving last position
+    cmp byte[eax+1], 0
+    je overflgpr
     cmp byte[eax], 2dh                      ;checking for -
     je flagproc                             ;jump to the label where i process the argument if it starts with -
+
+overflgpr:    
     mov ebx, dword[noffilesonst]    
     mov ecx, [edi]
     mov dword[fileonstack + ebx], ecx       ;saving the adress of the string with the file name 
@@ -167,7 +172,13 @@ loopfile:
     mov esi, dword[fileiterator]
     mov edi, fileonstack
     mov ebx, [edi + esi -4]                 ;passing the file string adress through ebx register(so i don't meddle with the stack)
+    cmp byte[ebx], 2dh
+    je stdion
     jmp md5                                 ;jump to md5 label(it will be acting as a function)
+
+stdion:
+    mov byte[stdinf], 255
+    jmp stdinmd5
 
 printres:
     cmp byte[tagf], 255                     ;check if the flag tag was activated
@@ -211,7 +222,7 @@ printnoast:                                 ;if yes, print double space
 
 nodoublespace:
     cmp byte[stdinf], 255
-    jmp printstdinmin
+    je printstdinmin
     mov esi, dword[fileiterator]
     mov edi, fileonstack
     mov ecx, [edi + esi - 4]             ;save the file name string adress on edi so that whe can discover its size
@@ -239,8 +250,7 @@ retstdinmin:
     int 80h
 
 nonwln:                                     ;finishes the current iteration
-    cmp byte[stdinf], 255
-    je end
+    mov byte[stdinf], 0
     mov esi, dword[fileiterator]
     cmp esi, dword[noffilesonst]
     jnz loopfile
@@ -254,7 +264,7 @@ printbsd:
     int 80h
     
     cmp byte[stdinf], 255
-    jmp printstdinmin
+    je printstdinmin
 
     mov esi, dword[fileiterator]
     mov edi, fileonstack
@@ -295,12 +305,17 @@ retstdinminbsd:
     int 80h    
 
 nonwlnbsd:
-    cmp byte[stdinf], 255
-    je end
+    mov byte[stdinf], 0
     mov esi, dword[fileiterator]
     cmp esi, dword[noffilesonst]
     jnz loopfile
     jmp end
+
+stdionchk:
+    mov byte[stdinf], 255
+    mov dword[edi + esi -4], sntdrinpt
+    mov ebx, 0
+    jmp nwlnloop
 
 onlygen:                                    ;in case check flag was activated, check for flag errors
     cmp byte[zerof], 255
@@ -320,10 +335,16 @@ onlygen:                                    ;in case check flag was activated, c
     mov byte[statusf], 0
 
 loopfilechk:
+    cmp byte[stdinf], 255
+    je stdionchk
+
     add dword[fileiterator], 4
     mov esi, dword[fileiterator]
     mov edi, fileonstack
-    mov ebx, [edi + esi -4]                 ;passing the file string adress through ebx register(so i don't meddle with the stack)
+    mov ebx, [edi + esi -4]                 ;passing the file string adress through ebx register
+
+    cmp byte[ebx], 2dh
+    je stdionchk
 
     mov eax, 5                              ;open file 
     mov ecx, 0
@@ -669,6 +690,7 @@ chkformorelns:                                      ;check the file for more lin
 chkformorefls:                                      ;in case the file ends, check if theres another one to check
     mov byte[fendedf], 0
     mov byte[onespacef], 0
+    mov byte[stdinf], 0
 
     cmp byte[statusf], 255
     je retnofver
@@ -992,6 +1014,8 @@ nofile:                                                 ;if there's no more argu
     je helpprint
     cmp byte[versionf], 255
     je versionprint
+    cmp dword[noffilesonst], 0
+    jne nohver
     mov byte[stdinf], 255
     jmp nohver
 
