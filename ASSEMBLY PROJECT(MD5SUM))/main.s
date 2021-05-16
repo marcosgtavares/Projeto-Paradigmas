@@ -16,6 +16,7 @@ binf:           db 0
 onespacef:      db 0
 fendedf:        db 0
 bsdmdf:         db 0
+stdinf:         db 0
 formwarnctr:    dd 0
 failwarnctr:    dd 0
 nreadfwarnctr:  dd 0
@@ -97,7 +98,7 @@ noffilesonst:   resb 4
 lastposst:      resb 4
 fileiterator:   resb 4
 hashand2spaces: resb 34
-filetohashcheck:resb 255
+filetohashcheck:resb 256
 chkdfilesiz:    resb 4
 decstr:         resb 10
 ctr1:           resb 1
@@ -158,6 +159,9 @@ chcktxtnsuperr:
     
     mov dword[fileiterator], 0
 
+    cmp byte[stdinf], 255
+    je stdinmd5
+
 loopfile:
     add dword[fileiterator], 4
     mov esi, dword[fileiterator]
@@ -186,6 +190,18 @@ printres:
     
     jmp nodoublespace
 
+printstdinmin:
+    mov eax, 4                  
+    mov ebx, 1
+    mov ecx, printzerrt
+    add ecx, 12
+    mov edx, 1
+    int 80h
+
+    cmp byte[tagf], 255
+    je retstdinminbsd
+    jmp retstdinmin
+
 printnoast:                                 ;if yes, print double space
     mov eax, 4
     mov ebx, 1
@@ -194,6 +210,8 @@ printnoast:                                 ;if yes, print double space
     int 80h
 
 nodoublespace:
+    cmp byte[stdinf], 255
+    jmp printstdinmin
     mov esi, dword[fileiterator]
     mov edi, fileonstack
     mov ecx, [edi + esi - 4]             ;save the file name string adress on edi so that whe can discover its size
@@ -209,6 +227,7 @@ namesizeloop:
     mov ebx, 1
     int 80h
 
+retstdinmin:
     cmp byte[zerof], 255                    ;check if zero flag was activated
     je nonwln
 
@@ -220,6 +239,8 @@ namesizeloop:
     int 80h
 
 nonwln:                                     ;finishes the current iteration
+    cmp byte[stdinf], 255
+    je end
     mov esi, dword[fileiterator]
     cmp esi, dword[noffilesonst]
     jnz loopfile
@@ -231,6 +252,9 @@ printbsd:
     mov ecx, bsd1
     mov edx, 5
     int 80h
+    
+    cmp byte[stdinf], 255
+    jmp printstdinmin
 
     mov esi, dword[fileiterator]
     mov edi, fileonstack
@@ -247,10 +271,11 @@ namesizeloopbsd:
     mov ebx, 1
     int 80h
 
+retstdinminbsd:
     mov eax, 4
     mov ebx, 1
     mov ecx, bsd2
-    mov edx, 5
+    mov edx, 4
     int 80h
 
     mov eax, 4
@@ -270,6 +295,8 @@ namesizeloopbsd:
     int 80h    
 
 nonwlnbsd:
+    cmp byte[stdinf], 255
+    je end
     mov esi, dword[fileiterator]
     cmp esi, dword[noffilesonst]
     jnz loopfile
@@ -333,7 +360,7 @@ nwlnloop:
     jl impformerr
     jmp keepreahashout
 
-bsdmode:
+bsdmode:                                    ;if an M is detected, process on bsd format
     mov byte[bsdmdf], 255
 
     add ecx, 1
@@ -342,7 +369,7 @@ bsdmode:
     mov edx, 1
     int 80h
 
-    mov dword[lastposst], ebx               ;checking the two spaces(or *) that separe the hash and the file, 
+    mov dword[lastposst], ebx               
     cmp eax, 0
     je impformerr
 
@@ -355,7 +382,7 @@ bsdmode:
     mov edx, 1
     int 80h
 
-    mov dword[lastposst], ebx               ;checking the two spaces(or *) that separe the hash and the file, 
+    mov dword[lastposst], ebx               
     cmp eax, 0
     je impformerr
 
@@ -368,7 +395,7 @@ bsdmode:
     mov edx, 1
     int 80h
 
-    mov dword[lastposst], ebx               ;checking the two spaces(or *) that separe the hash and the file, 
+    mov dword[lastposst], ebx               
     cmp eax, 0
     je impformerr
 
@@ -381,7 +408,7 @@ bsdmode:
     mov edx, 1
     int 80h
 
-    mov dword[lastposst], ebx               ;checking the two spaces(or *) that separe the hash and the file, 
+    mov dword[lastposst], ebx               
     cmp eax, 0
     je impformerr
 
@@ -429,7 +456,7 @@ readfrom0bsd:
     mov edx, 1
     int 80h
 
-    mov dword[lastposst], ebx               ;checking the two spaces(or *) that separe the hash and the file, 
+    mov dword[lastposst], ebx               
     cmp eax, 0
     je impformerr
 
@@ -442,7 +469,7 @@ readfrom0bsd:
     mov edx, 1
     int 80h
 
-    mov dword[lastposst], ebx               ;checking the two spaces(or *) that separe the hash and the file, 
+    mov dword[lastposst], ebx               
     cmp eax, 0
     je impformerr
 
@@ -483,7 +510,7 @@ keepreahash:                                ;keeps iterating
     je hashcorrect
     jmp readhash
 
-bsdending:
+bsdending:                                  ;how the end of a line is expected on the bsd format
     mov ecx, hashand2spaces
     add ecx, 32
     mov eax, 3
@@ -965,6 +992,7 @@ nofile:                                                 ;if there's no more argu
     je helpprint
     cmp byte[versionf], 255
     je versionprint
+    mov byte[stdinf], 255
     jmp nohver
 
 helpprint:                                              ;labels where the error are printed
@@ -1477,6 +1505,53 @@ end:                                ;end label
     mov eax, 1
     mov ebx, dword[exitnum]
     int 80h
+
+stdinmd5:
+    mov dword [h0], 1732584193
+    mov dword [h1], 4023233417
+    mov dword [h2], 2562383102
+    mov dword [h3], 271733878
+    mov esi, 0
+    mov dword [flenght], 0
+    mov dword [tlenght], 0
+    mov ebx, 0
+    mov edx, 1
+    mov ecx, fileallocmem
+
+zerocntr:
+    mov esi, 0
+    add dword [tlenght], 1
+
+stdinloop:                    
+    mov eax, 3
+    int 80h
+
+    add ecx, 1
+    add esi, 1
+
+    add dword[flenght], eax              ;add lenght in bits
+    add dword[flenght], eax
+    add dword[flenght], eax
+    add dword[flenght], eax
+    add dword[flenght], eax
+    add dword[flenght], eax
+    add dword[flenght], eax
+    add dword[flenght], eax
+    cmp eax, 0
+    je leavendec
+    cmp esi, 64
+    je zerocntr
+    jmp stdinloop
+
+leavendec:
+    mov eax, 64
+    sub eax, esi
+    add ecx, eax
+
+    sub esi, 1
+    mov eax, esi
+
+    jmp padding
 
 md5:
     mov dword [h0], 1732584193
