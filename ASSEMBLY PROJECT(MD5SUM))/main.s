@@ -15,6 +15,7 @@ versionf:       db 0
 binf:           db 0
 onespacef:      db 0
 fendedf:        db 0
+bsdmdf:         db 0
 formwarnctr:    dd 0
 failwarnctr:    dd 0
 nreadfwarnctr:  dd 0
@@ -304,7 +305,156 @@ loopfilechk:
 
     mov ebx, eax                    
 
-    jmp nwlnloop    
+nwlnloop:                                     
+    mov esi, 0
+    mov ecx, hashand2spaces
+    inc esi
+    mov eax, 3
+    mov edx, 1
+    int 80h
+
+    cmp eax, 0
+    je chkformorefls
+
+    add dword[lnsonfilectr], 1
+    
+    mov dword[lastposst], ebx                ;done out of loop to check for eof
+
+    cmp byte[ecx], 77
+    je bsdmode
+
+    cmp byte[ecx], 102                       ;checks for chracters that are not representations of hexadecimal numbers
+    jg impformerr
+    cmp byte[ecx], 97
+    jge keepreahashout
+    cmp byte[ecx], 57
+    jg impformerr
+    cmp byte[ecx], 48
+    jl impformerr
+    jmp keepreahashout
+
+bsdmode:
+    mov byte[bsdmdf], 255
+
+    add ecx, 1
+
+    mov eax, 3
+    mov edx, 1
+    int 80h
+
+    mov dword[lastposst], ebx               ;checking the two spaces(or *) that separe the hash and the file, 
+    cmp eax, 0
+    je impformerr
+
+    cmp byte[ecx], 68
+    jne impformerr
+
+    add ecx, 1
+
+    mov eax, 3
+    mov edx, 1
+    int 80h
+
+    mov dword[lastposst], ebx               ;checking the two spaces(or *) that separe the hash and the file, 
+    cmp eax, 0
+    je impformerr
+
+    cmp byte[ecx], 53
+    jne impformerr
+
+    add ecx, 1
+
+    mov eax, 3
+    mov edx, 1
+    int 80h
+
+    mov dword[lastposst], ebx               ;checking the two spaces(or *) that separe the hash and the file, 
+    cmp eax, 0
+    je impformerr
+
+    cmp byte[ecx], 32
+    jne impformerr
+
+    add ecx, 1
+
+    mov eax, 3
+    mov edx, 1
+    int 80h
+
+    mov dword[lastposst], ebx               ;checking the two spaces(or *) that separe the hash and the file, 
+    cmp eax, 0
+    je impformerr
+
+    cmp byte[ecx], 40
+    jne impformerr
+
+readfilechkbsd:                                    ;ready to get the file to use md5 on
+    mov esi, filetohashcheck
+    
+readfrom0bsd:
+    mov eax, 3
+    mov ecx, esi
+    mov edx, 1
+    int 80h
+
+    mov dword[lastposst], ebx
+    add esi, 1
+    cmp eax, 0
+    je impformerr
+    cmp byte[esi -1], 41
+    jne readfrom0bsd
+
+    mov byte[esi -1], 0
+    sub esi, filetohashcheck
+    mov dword[chkdfilesiz], esi
+    mov dword[lastposst], ebx
+    mov ebx, filetohashcheck
+
+    mov ecx, hashand2spaces
+    mov ebx, dword[lastposst]
+    mov eax, 3
+    mov edx, 1
+    int 80h
+
+    mov dword[lastposst], ebx               
+    cmp eax, 0
+    je impformerr
+
+    cmp byte[ecx], 32
+    jne impformerr
+
+    add ecx, 1
+
+    mov eax, 3
+    mov edx, 1
+    int 80h
+
+    mov dword[lastposst], ebx               ;checking the two spaces(or *) that separe the hash and the file, 
+    cmp eax, 0
+    je impformerr
+
+    cmp byte[ecx], 61
+    jne impformerr
+
+    add ecx, 1
+
+    mov eax, 3
+    mov edx, 1
+    int 80h
+
+    mov dword[lastposst], ebx               ;checking the two spaces(or *) that separe the hash and the file, 
+    cmp eax, 0
+    je impformerr
+
+    cmp byte[ecx], 32
+    jne impformerr
+
+    mov esi, 0
+    mov ecx, hashand2spaces
+    mov eax, 3
+    mov edx, 1
+
+    jmp readhash
 
 keepreahashout:
     add ecx, 1
@@ -333,7 +483,32 @@ keepreahash:                                ;keeps iterating
     je hashcorrect
     jmp readhash
 
+bsdending:
+    mov ecx, hashand2spaces
+    add ecx, 32
+    mov eax, 3
+    mov edx, 1
+    int 80h
+
+    mov dword[lastposst], ebx
+    cmp eax, 0
+    je bsdfended
+
+    cmp byte[ecx], 10
+    jne impformerr
+
+retbsbfended:
+    mov ebx, filetohashcheck
+    jmp md5
+
+bsdfended:
+    mov byte[fendedf], 255
+    jmp retbsbfended
+
 hashcorrect:                                ;hash has no problems
+    cmp byte[bsdmdf], 255
+    je bsdending
+
     mov eax, 3
     mov edx, 1
     int 80h
@@ -405,6 +580,7 @@ printrescheck:                                  ;prints the file name and if it 
     mov esi, 0
     mov eax, digest
     mov ebx, hashand2spaces
+    mov byte[bsdmdf], 0
 
 checkhshmatch:                                  ;check if the hash match
     inc esi
@@ -461,30 +637,7 @@ chkformorelns:                                      ;check the file for more lin
     cmp byte[fendedf], 255
     je chkformorefls
 
-nwlnloop:                                           ;it used to be above but it wasn't counting the lines properly so it was shifted down here
-    mov esi, 0
-    mov ecx, hashand2spaces
-    inc esi
-    mov eax, 3
-    mov edx, 1
-    int 80h
-
-    cmp eax, 0
-    je chkformorefls
-
-    add dword[lnsonfilectr], 1
-    
-    mov dword[lastposst], ebx                ;done out of loop to check for eof
-
-    cmp byte[ecx], 102                       ;checks for chracters that are not representations of hexadecimal numbers
-    jg impformerr
-    cmp byte[ecx], 97
-    jge keepreahashout
-    cmp byte[ecx], 57
-    jg impformerr
-    cmp byte[ecx], 48
-    jl impformerr
-    jmp keepreahashout
+    jmp nwlnloop
 
 chkformorefls:                                      ;in case the file ends, check if theres another one to check
     mov byte[fendedf], 0
@@ -544,6 +697,7 @@ popiterone:                                 ;checking if its the simple case aga
     cmp byte[eax + 2], 0
     je popiter
     mov esi, 0
+
 bctzloop:                                   ;if it is not, do the complex case(multiple flags on the same -)
     inc esi
     cmp byte[eax + esi], 98
