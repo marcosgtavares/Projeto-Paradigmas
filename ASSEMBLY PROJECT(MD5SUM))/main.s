@@ -286,6 +286,11 @@ onlygen:                                    ;in case check flag was activated, c
 
     mov dword[fileiterator], 0
 
+    cmp byte[warnf], 255
+    jnz loopfilechk
+
+    mov byte[statusf], 0
+
 loopfilechk:
     add dword[fileiterator], 4
     mov esi, dword[fileiterator]
@@ -411,6 +416,9 @@ checkhshmatch:                                  ;check if the hash match
 
     cmp byte[quietf], 255
     je chkformorelns
+    
+    cmp byte[statusf], 255
+    je chkformorelns
 
     mov eax, 4
     mov ebx, 1
@@ -429,6 +437,10 @@ checkhshmatch:                                  ;check if the hash match
 
 failedcheck:
     mov dword[exitnum], 1
+
+    cmp byte[statusf], 255
+    je chkformorelns
+
     mov eax, 4
     mov ebx, 1
     mov ecx, filetohashcheck
@@ -445,7 +457,6 @@ failedcheck:
     add dword[failwarnctr], 1
 
 chkformorelns:                                      ;check the file for more lines to do the checking 
-    
     mov ebx, dword[lastposst]
     cmp byte[fendedf], 255
     je chkformorefls
@@ -463,9 +474,7 @@ nwlnloop:                                           ;it used to be above but it 
 
     add dword[lnsonfilectr], 1
     
-
     mov dword[lastposst], ebx                ;done out of loop to check for eof
-    
 
     cmp byte[ecx], 102                       ;checks for chracters that are not representations of hexadecimal numbers
     jg impformerr
@@ -480,6 +489,9 @@ nwlnloop:                                           ;it used to be above but it 
 chkformorefls:                                      ;in case the file ends, check if theres another one to check
     mov byte[fendedf], 0
     mov byte[onespacef], 0
+
+    cmp byte[statusf], 255
+    je retnofver
 
     cmp dword[formwarnctr], 0
     jg printformwarn
@@ -984,6 +996,9 @@ nslooperr:
     mov edx, 28
     int 80h
 
+    cmp byte[checkf], 255
+    je chkformorelns
+
     jmp nonwln
 
 printformwarn:                              ;print the warns
@@ -1186,6 +1201,8 @@ multipleerrors:                             ;special case on --check that prints
 
     add dword[nreadfwarnctr], 1
     mov esi, ebx
+    cmp byte[statusf], 255
+    je printnfilerror
 
     mov ecx, printnfilerrort
     mov eax, 4
