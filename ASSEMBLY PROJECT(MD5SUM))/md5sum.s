@@ -250,6 +250,13 @@ retstdinmin:
     int 80h
 
 nonwln:                                     ;finishes the current iteration
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, sntdrinpt                    ;if not, print \n (found on the same string as the two spaces)
+    add ecx, 16
+    mov edx, 1
+    int 80h
+
     mov byte[stdinf], 0
     mov esi, dword[fileiterator]
     cmp esi, dword[noffilesonst]
